@@ -165,11 +165,45 @@ function addProfile(event) {
     document.getElementById('userManager').value = ''; // Limpa o campo do gestor
 }
 
-function renderProfiles() {
+function filtroDoPerfil(){
+    const statusSelecionado = document.getElementById('filtroPerfil').value;
+    
+    const filteredProfiles = profiles.filter(dept => 
+        statusSelecionado === 'all' || dept.status === statusSelecionado
+    );
+
+    // Agora renderize os departamentos filtrados
+    renderProfiles(filteredProfiles);
+}
+
+const infNovoPerfil = () => {
+    const novoPerfil = document.getElementById("userName")
+    const setor = document.getElementById("userDepartment") 
+    const gestor = document.getElementById("userManager") 
+    const email = document.getElementById("email") 
+    const cargo = document.getElementById("cargo") 
+    const senhaInput = document.getElementById("senha") 
+    const confirmacaoSenha = document.getElementById("confirmacaoSenha") 
+
+    const infPerfil = {
+        nome: novoPerfil.value,
+        setor: setor.value,
+        gestor: gestor.value,
+        email: email.value,
+        cargo: cargo.value,
+        senhaInput: senhaInput.value,
+        confirmacaoSenha: confirmacaoSenha.value
+    }
+
+    console.log(infPerfil)
+return
+}
+
+function renderProfiles(filteredProfiles = profiles) {
     const grid = document.getElementById('profilesGrid');
     grid.innerHTML = '';
 
-    profiles.forEach(profile => {
+    filteredProfiles.forEach(profile => {
         const card = document.createElement('div');
         card.className = 'profile-card';
         const statusClass = profile.ativo ? 'status-active' : 'status-blocked';
