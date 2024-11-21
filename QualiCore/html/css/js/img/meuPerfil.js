@@ -36,6 +36,8 @@ function toggleEdit() {
     const editButton = document.querySelector('.edit-button');
     const editableElements = document.querySelectorAll('.info-value');
     const fullNameDisplay = document.getElementById('fullNameDisplay');
+    const username = document.getElementById('username')
+    const nomeUsuario = document.getElementById('nomeUsuario')
 
     if (isEditing) {
         profileCard.classList.add('editing');
@@ -58,6 +60,17 @@ function toggleEdit() {
             element.contentEditable = false;
         });
         // Aqui você poderia adicionar a lógica para salvar as alterações no servidor
+
+        var dados = {
+            nomeUsuario: nomeUsuario.innerText,
+            username: username.innerText,
+            fullNameDisplay: fullNameDisplay.innerText,
+            nomeCompleto: document.getElementById('nomeCompleto').innerText,
+            telefone:  document.getElementById('telefone').innerText,
+            instituicao:  document.getElementById('instituicao').innerText,
+            position: document.getElementById('department').innerText 
+
+        }
     }
 }
 
