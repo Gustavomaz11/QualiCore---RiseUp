@@ -7,9 +7,10 @@ const modalBody = document.querySelector('.modalBody')
 const bodyTabelaRnc = document.querySelector('#bodyTabelaRNC')
 const DivlinhaDoTempo = document.querySelector('.linhaDoTempo')
 const detalhesRncDoModal = document.querySelector('.detalhesRncDoModal')
-
 const btnFormulario = document.querySelector('#btnFormulario')
 const btnLinhaDoTempo = document.querySelector('#btnLinhaDoTempo')
+
+let atualActive
 
 btnFormulario.addEventListener('click',()=>{
     detalhesRncDoModal.classList.remove('sumirConteudoModal')
@@ -285,7 +286,7 @@ async function handleEdit5w2h (body){
 async function handleConclusao (body){
     try {   
         const respostaJson = await fetch('http://localhost:3333/rncConcluidas/conclusao',{
-            method:"PATCH",
+            method:"POST",
             headers:{
                 "Content-type":"application/json"
             },
@@ -395,7 +396,6 @@ document.addEventListener('DOMContentLoaded',async function () {
     let rncSolicitadas = await handleGetSolicitacao()
     let rncAceitas = await handleGetRnc()
     let rncConcluidas = await handleGetRncConcluidas()
-
     rnc.push(...rncSolicitadas)
     rnc.push(...rncAceitas)
     rnc.push(...rncConcluidas)
@@ -524,6 +524,7 @@ document.addEventListener('DOMContentLoaded',async function () {
     window.onclick = function (event) {
         if (event.target === modal) {
             closeModal();
+            inicializarAba()
         }
     };
 
@@ -552,10 +553,16 @@ document.addEventListener('DOMContentLoaded',async function () {
     for (let z = 0; z < listaDetalhesBtn.length; z++) {
         listaDetalhesBtn[z].addEventListener('click', (e) => {
             e.preventDefault();
+            document.querySelectorAll('.tab-content').forEach((content)=>{
+                if(content.className.includes('active'))
+                    atualActive = content.getAttribute('id')
+            })
             resetAbas();
             abas[z].style.display = 'flex';
             abas[z].classList.add('active');
             listaDetalhesBtn[z].classList.add('active');
+            
+
         });
     }
 
@@ -591,20 +598,29 @@ function handleTouchMoveEnd (evt) {
     evt.target.classList.remove('dragging')
     const touch = evt.changedTouches[0]
     const targetColumn = document.elementFromPoint(touch.clientX , touch.clientY)
-
+    const rncStatus = draggedCard.getAttribute('data-status')
     if (targetColumn && targetColumn.classList.contains('kanban-cards')) {
-        let idRnc = draggedCard.getAttribute('data-_id')
-        const body = {
-            idRnc,
-            status:targetColumn.getAttribute('data-column'),
-            user
+        if(rncStatus != 'analise' && rncStatus != 'concluido'){
+            let idRnc = draggedCard.getAttribute('data-_id')
+            const body = {
+                idRnc,
+                status:targetColumn.getAttribute('data-column'),
+                user
+            }
+            targetColumn.appendChild(draggedCard)
+            draggedCard.setAttribute('data-status',targetColumn.getAttribute('data-column'))
+            handleChangeStatus(body)
+            modificandoRncPeloId(draggedCard)
+            updateColumnCounts()
+            atualizandoRnc()
+        }else if(targetColumn.getAttribute('data-column') == "concluido"){
+            alert('Para concluir a RNC é necessario abrir o modal e preencher o formulario')
+        }else if(rncStatus == 'concluido'){
+            alert('Par modificar o status da RNC é necessario que ela não esteja como concluida')
         }
-        targetColumn.appendChild(draggedCard)
-        draggedCard.setAttribute('data-status',targetColumn.getAttribute('data-column'))
-        handleChangeStatus(body)
-        modificandoRncPeloId(draggedCard)
-        updateColumnCounts()
-        atualizandoRnc()
+        else{
+            alert('Para modificar o status da RNC é necessario aceitar a solicitação')
+        }
     }
     draggedCard = null
     document.querySelectorAll(".drag-over")?.forEach((drag)=>{
@@ -780,9 +796,11 @@ function openModalOnDoubleClick(e) {
     document.querySelector('#origem').value = rncData.origem;
     document.querySelector('#setor-autuante').value = rncData.setorAutuante.nome
     document.querySelector('#enquadramento').value = rncData.enquadramento
-    const avaliacaoDeAcao = document.getElementsByName("eficacia")
+    const dataPrevistaConclusao = document.querySelector('#dataPrevista')
+    dataPrevistaConclusao.value = rncData.dataPrevista
+
     const acaoEficacia = document.getElementsByName('acaoEficacia')
-    acaoEficacia.forEach((currentAcaoEficacia,index)=>{
+    acaoEficacia.forEach((currentAcaoEficacia)=>{
         if(currentAcaoEficacia.value == rncData.acaoDaEficacia)
             currentAcaoEficacia.checked = true
     })
@@ -803,23 +821,161 @@ function openModalOnDoubleClick(e) {
     inputOque.value = rncData.oque == "null" ? null : rncData.oque
     inputPorque.value = rncData.porque == "null" ? null : rncData.porque
     inputQuando.value = rncData.quando
-    const newSaveBtn = saveBtn.cloneNode(true);  // Clona o botão para remover os eventos antigos
-    newSaveBtn.textContent = 'teste'
+    const checkboxes = document.querySelectorAll(".eficaciaRnc")
+    const inputAvalicaoAcao = document.getElementById("tipoRncText")
+    const envidenciaDeEficacia = document.querySelector('#envidenciaDeEficacia')
+
+    checkboxes.forEach((checkBoxAvalicaoAcao)=>{
+        if(rncData.avaliacaoDeAcao != null){
+            rncData.avaliacaoDeAcao.map((acao)=>{
+                if(checkBoxAvalicaoAcao.value == acao){
+                    checkBoxAvalicaoAcao.checked = true
+                }else if(acao != 'Documental' && acao != 'Visual' && acao != 'Entrevista' &&  acao != undefined &&  acao != null){
+                    inputAvalicaoAcao.value = acao
+                }
+            })
+        }
+    })
+    const newSaveBtn = saveBtn.cloneNode(true); // Clona o botão para remover os eventos antigos
+    if(rncData.status == 'analise'){
+        newSaveBtn.textContent = 'Aceitar'
+    }
+    else{
+        newSaveBtn.textContent = 'Salvar'
+    }
     saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);  // Substitui o botão antigo
     
     // sistema de botão tabs
-    if(rncData.setorAtuar == "null"){
+    if(rncData.setorAtuar == null){
         andamentoBtn.disabled = true
     }else{
         andamentoBtn.disabled = false
     }
-    if(rncData.status != 'concluido'){
+    if(rncData.quem == null){
         conclusaoBtn.disabled = true
     }else{
         conclusaoBtn.disabled = false
     }
 
     let funcioanriosSetorAtuar = funcionarios.filter((funcionario)=> funcionario.departamento.sigla == rncData.setorAtuar?.sigla)
+
+    function checkChangeInBackForm (){
+        let changes = false
+            let tipoMark
+            const isTextInputFilled = inputAvalicaoAcao.value.trim() !== ""
+            tipo.forEach((currentTipo)=>{
+                if(currentTipo.checked){
+                    tipoMark = currentTipo.value
+                }
+            })
+            
+            if(atualActive == 'detalhamento'){
+                if(rncData.tipo != tipoMark){
+                    changes = true
+                }
+                
+                if(rncData.setorAtuar?._id != setorAtuar.value){
+                    changes = true
+                }
+    
+                if(rncData.nivelSeveridade != severidade.value){
+                    changes = true 
+                }
+    
+                if(rncData.status != status.value){
+                    changes =  true
+                }
+            }else if(atualActive == 'andamento'){
+                if(inputOque.value==""?null:inputOque.value != rncData.oque){
+                    changes = true
+                }
+                if(selectQuem.value ==""?null:selectQuem.value != rncData.quem?._id){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputQuando.value ==""?null:inputQuando.value != rncData.quando){
+                    changes = true
+                    console.log('aqui') 
+                }
+    
+                if(inputOnde.value==""?null:inputOnde.value != rncData.onde){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputComo.value==""?null:inputComo.value != rncData.como){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputPorque.value==""?null:inputPorque.value != rncData.porque){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputCusto.value == ""?null:inputCusto.value != rncData.custo){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputEvid.value){
+                    changes = true
+                    console.log('aqui')
+                }
+            }else if(atualActive == 'conclusao'){
+                let avaliacaoDeAcao = []
+    
+                if(isTextInputFilled)
+                   avaliacaoDeAcao.push(inputAvalicaoAcao.value.trim())
+        
+                checkboxes.forEach((checkbox)=>{
+                    if(checkbox.checked)
+                        avaliacaoDeAcao.push(checkbox.value)
+                })
+        
+                if(!arraysAreEqualUnordered(avaliacaoDeAcao,rncData.avaliacaoDeAcao)){
+                    changes = true
+                    console.log('aqui')
+                }
+                
+                let acaoDaEficacia = "null"
+        
+                acaoEficacia.forEach((radioAcao)=>{
+                    if(radioAcao.checked)
+                        acaoDaEficacia = radioAcao.value
+                })
+        
+                if(rncData.acaoDaEficacia != acaoDaEficacia){
+                    changes = true
+                }
+                let dataPrevista = rncData.dataPrevista == 'null'?'':rncData.dataPrevista
+                if(dataPrevistaConclusao.value != dataPrevista){
+                    changes = true                
+                }
+        
+                // if(envidenciaDeEficacia.value){
+                //     changes = true
+                // }
+            }
+    
+            if(!changes) // se não tiver mudanças ele retorna
+                return
+    
+            alert('Lembre-se você não salvou as alterações do formulario anterior')
+    }
+
+    if(rncData.status != 'analise'){
+        detalhamentoRncBtn.addEventListener('click',checkChangeInBackForm)
+        andamentoBtn.addEventListener('click',checkChangeInBackForm)
+        conclusaoBtn.addEventListener('click',()=>{
+            newSaveBtn.innerText = "Concluir"
+            checkChangeInBackForm
+        })
+    }else{
+        detalhamentoRncBtn.removeEventListener('click',checkChangeInBackForm)
+    }
+
 
     funcioanriosSetorAtuar?.map((funcionarioSetorAtuar)=>{
         const options = document.createElement('option')
@@ -829,11 +985,11 @@ function openModalOnDoubleClick(e) {
     })
     selectQuem.value = rncData.quem?._id
     newSaveBtn.addEventListener('click', async ()=>{
-        let active = null
-
         if(status.value){
             status.set
         } 
+
+        let active = null
 
         document.querySelectorAll('.tab-content').forEach((element)=>{
             if(element.className.includes('active')){
@@ -843,8 +999,6 @@ function openModalOnDoubleClick(e) {
 
         let formSelect = active.getAttribute('id')
 
-        const checkboxes = document.querySelectorAll(".eficaciaRnc")
-        const inputAvalicaoAcao = document.getElementById("tipoRncText")
         const isAnyCheckboxChecked = Array.from(checkboxes).some(checkbox => checkbox.checked)
         const isTextInputFilled = inputAvalicaoAcao.value.trim() !== ""
         
@@ -856,6 +1010,12 @@ function openModalOnDoubleClick(e) {
                 checkboxes.forEach((checkbox)=> checkbox.setCustomValidity(""))
                 inputAvalicaoAcao.setCustomValidity("")
             }
+        }
+
+        if(status.value == 'analise'){
+            status.setCustomValidity("RNC não pode ser aceita com status em Análise")
+        }else{
+            status.setCustomValidity("")
         }
 
         if(!active.reportValidity())
@@ -971,7 +1131,7 @@ function openModalOnDoubleClick(e) {
                 mudancas.push({porque:inputPorque.value})
             }
 
-            if(inputCusto.value && rncData.custo != rnc.custo){
+            if(inputCusto.value != rncData.custo ){
     
                 mudancas.push({custo:inputCusto.value})
             }
@@ -1006,13 +1166,20 @@ function openModalOnDoubleClick(e) {
                     avaliacaoDeAcao.push(checkbox.value)
             })
             
+            let acaoDaEficacia
+
+            acaoEficacia.forEach((radioAcao)=>{
+                if(radioAcao.checked)
+                    acaoDaEficacia = radioAcao.value
+            })
+
             const body = {
                 idRnc:rncData._id,
                 user,
                 avaliacaoDeAcao,
-                acaoDaEficacia:"Sim",
+                acaoDaEficacia,
                 arquivosComprovarEficiencia:['documento'],
-                dataPrevista:"06-09-2004"
+                dataPrevista:dataPrevistaConclusao.value
             }
 
             await handleConclusao(body)
@@ -1088,7 +1255,7 @@ function reloadCard(rnc) {
     // if(typeof rnc.linhaDoTempo == 'string')
     //     rnc.linhaDoTempo = JSON.parse(rnc.linhaDoTempo)
     Object.entries(rnc).forEach(([key, value]) => {
-        if(key === 'linhaDoTempo' || key === 'pessoasAnexadas' || key === 'enquadramento' || key === 'criador' || key === 'setorAutuante' || key === 'setorAtuar' || key === 'quem'){
+        if(key === 'linhaDoTempo' || key === 'pessoasAnexadas' || key === 'enquadramento' || key === 'criador' || key === 'setorAutuante' || key === 'setorAtuar' || key === 'quem' || key === "avaliacaoDeAcao"){
             card.setAttribute(`data-${key}`, JSON.stringify(value))
         }else
             card.setAttribute(`data-${key}`, value)
@@ -1203,6 +1370,15 @@ function modificandoRncPeloId (divRnc) {
     if(modificacao){
         rnc = array
     }
+}
+
+function arraysAreEqualUnordered(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false
+  
+    const sortedArr1 = [...arr1].sort()
+    const sortedArr2 = [...arr2].sort()
+  
+    return sortedArr1.every((value, index) => value === sortedArr2[index])
 }
 
 function updateColumnCounts() {
