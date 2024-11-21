@@ -118,18 +118,45 @@ for(let i = 0; i < listaSidebarBtn.length; i++) {
     })
 }
 
+function filtrodoStatus() {
+    const statusSelecionado = document.getElementById('filtroStatus').value;
+    
+    const filteredDepartments = departments.filter(dept => 
+        statusSelecionado === 'all' || dept.status === statusSelecionado
+    );
+
+    // Agora renderize os departamentos filtrados
+    renderDepartments(filteredDepartments);
+}
 
 let departments = null
 
-function renderDepartments() {
+const infNovoDepartamento = () => {
+    const novoDepartamento = document.getElementById("departmentName")
+    const siglaDepartamento = document.getElementById("siglaDepartamento")  
+    const email = document.getElementById("email") 
+    const ativo = document.querySelector('#radioContainer input[name="ativo"]:checked'); 
+
+    const infDepartamento = {
+        nome: novoDepartamento.value,
+        sigla: siglaDepartamento.value,
+        email: email.value,
+        ativo: ativo.value,
+    }
+
+    console.log(infDepartamento)
+return
+}
+
+function renderDepartments(filteredDepartments = departments) {
     const grid = document.getElementById('departmentsGrid');
     grid.innerHTML = '';
 
-    departments.forEach(dept => {
+    filteredDepartments.forEach(dept => {
         const card = document.createElement('div');
         card.className = 'department-card';
-        const statusClass = dept.ativo ? 'status-active' : 'status-blocked';
-        const statusText = dept.ativo ? 'Ativo' : 'Bloqueado';
+        const statusClass = dept.status === 'active' ? 'status-active' : 'status-blocked';
+        const statusText = dept.status === 'active' ? 'Ativo' : 'Bloqueado';
 
         card.innerHTML = `
             <div class="department-header">
