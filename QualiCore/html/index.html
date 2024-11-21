@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QualiCore</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="shortcut icon" href="css/js/img/faviconQualicore.svg" type="image/x-icon">
+    <script src="css/js/img/scrips.js" defer></script>
+</head>
+<body>
+    <canvas class="particles" id="particles"></canvas>
+    <header>
+        <img src="css/js/img/qualicore.svg" alt="logoQualiCore" class="logo">
+        <img src="css/js/img/logo_1_1-removebg-preview.png" alt="logoFSPHeGoverno" class="logo">
+    </header>
+    <main class="container">
+        <form class="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="@fsph.gov.br">
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" name="senha" id="senha" placeholder="Digite sua senha">
+            </div>
+            <button type="submit">Entrar</button>
+            <div class="signup-link">
+                <span>Não tem acesso? <a href="cadastro.html">Clique aqui!</a></span>
+                <a href="esqueceuSenha.html">Esqueceu Senha?</a>
+            </div>
+        </form>
+    </main>
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <p>Usuário ou senha inválida</p>
+            <button id="closePopup">Fechar</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QualiCore - Usuários</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="shortcut icon" href="css/js/img/faviconQualicore.svg" type="image/x-icon">
+    <link rel="stylesheet" href="css/departamentos.css">
+    <script src="css/js/img/departamentos.js" defer></script>
+</head>
+<body>
+    <aside>
+        <button type="button" id="btnCloneMenu"><i class="bi bi-x"></i></button>
+        <div class="divisaoSideBar">
+            <div class="conteudoSideBar">
+                <img src="css/js/img/qualicore.svg" alt="qualiCoreLogo" width="290rem" height="auto">
+            </div>
+            <div class="conteudoSideBar">
+                <button type="button" id="dashBtn"><i class="bi bi-house-door"></i>Dashboard</button>
+                <button type="button" id="relatorioBtn"><i class="bi bi-clipboard2-data-fill"></i>Relatório de
+                    Qualidade</button>
+                <button type="button" id="rncBtn"><i class="bi bi-exclamation-triangle"></i>RNC</button>
+                <button type="button" id="dashDetalhadoBtn"><i class="bi bi-graph-up"></i>Gráficos Detalhados</button>
+                <button type="button" id="monitoramentoBtn"><i class="bi bi-clock"></i>Monitoramento</button>
+                <button type="button" id="departamentoBtn"><i class="bi bi-grid"></i>Departamentos</button>
+                <button type="button" id="usuariosBtn"><i class="bi bi-people"></i>Usuários</button>
+                <button type="button" id="limparCash">Limpar cash</button>
+            </div>
+        </div>
+        <div class="divisaoSideBar">
+            <div class="conteudoSideBar">
+                <h5>QualiCore - Governo do Estado de Sergipe</h5>
+                <h6>2024 Fundação de Saúde Parreiras Horta</h6>
+            </div>
+            <div class="conteudoSideBar">
+                <h5>FSPH - Sergipe</h5>
+            </div>
+        </div>
+    </aside>
+    <main>
+        <section class="secaoPrincipal">
+            <div class="containerBusca">
+                <input type="text" id="busca" class="campoBusca" placeholder="Procurar">
+                <i class="bi bi-search iconeBusca"></i>
+            </div>
+            <div class="containerBtnAndInfo">
+                <div class="botoesAcao">
+                    <button type="button" id="btnMenu" class="botaoIcone"><i class="bi bi-list"></i></button>
+                    <button type="button" class="botaoIcone"><i class="bi bi-bell"></i></button>
+                    <button type="button" class="botaoIcone" id="cxEntradaBtn"><i class="bi bi-envelope"></i></button>
+                </div>
+                <hr/>
+                <div class="infoUsuario">
+                    <span>Olá, <span id="nome">Gustavo</span></span>
+                    <div class="avatarUsuario" id="botaoPerfil">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div class="dropdownPerfil" id="menuPerfil">
+                        <a class="itemDropdown" id="meuPerfilBtn">
+                            <i class="bi bi-person-circle"></i>
+                            Meu Perfil
+                        </a>
+                        <a href="#" class="itemDropdown">
+                            <i class="bi bi-bell"></i>
+                            Notificações
+                        </a>
+                        <div class="separadorDropdown"></div>
+                        <a href="index.html" class="itemDropdown">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+    </section>
+        <nav class="navPrincipal">
+            <div class="logo">Departamentos</div>
+            <button class="add-btn" onclick="openModal()">
+                <i class="fas fa-plus"></i> Novo Departamento
+            </button>
+        </nav>
+    
+        <div class="container">
+            <div class="departments-grid" id="departmentsGrid"></div>
+        </div>
+    
+        <div class="modal" id="addDepartmentModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Adicionar Departamento</h2>
+                    <button class="close-modal" onclick="closeModal()">&times;</button>
+                </div>
+                <form id="addDepartmentForm">
+                    <div class="form-group">
+                        <label for="departmentName">Nome do Departamento</label>
+                        <input type="text" id="departmentName" placeholder="Digite o nome do Departamento" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="siglaDepartamento">Sigla do Departamento</label>
+                        <input type="text" id="siglaDepartamento" placeholder="Digite a sigla do Departamento" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email do Gestor</label>
+                        <input type="text" id="email" placeholder="@fsph.com.br" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ativo</label>
+                        <div id="radioContainer">
+                            <input type="radio" id="sim" name="ativo" value="Sim" >
+                            <label for="sim">Sim</label>
+                
+                            <input type="radio" id="nao" name="ativo" value="Não" >
+                            <label for="nao">Não</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Adicionar</button>
+                </form>
+            </div>
+        </div>
+    
+    </main>
+</body>
+</html>
