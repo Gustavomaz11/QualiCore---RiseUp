@@ -20,6 +20,18 @@ btnCloneMenu.addEventListener('click',()=>{
     document.querySelector('main').style = 'display: block;'
 })
 
+botaoPerfil.addEventListener('click', function(event) {
+    event.stopPropagation();
+    menuPerfil.classList.toggle('ativo');
+});
+
+document.addEventListener('click', function(event) {
+    if (!menuPerfil.contains(event.target) && !botaoPerfil.contains(event.target)) {
+        menuPerfil.classList.remove('ativo');
+    }
+});
+
+
 // pegando a rnc pelo localstorege
 let rnc = localStorage.getItem('rnc')
 if (rnc!= null)

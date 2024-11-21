@@ -110,6 +110,18 @@ for(let i = 0; i < listaSidebarBtn.length; i++) {
     })
 }
 
+botaoPerfil.addEventListener('click', function(event) {
+    event.stopPropagation();
+    menuPerfil.classList.toggle('ativo');
+});
+
+document.addEventListener('click', function(event) {
+    if (!menuPerfil.contains(event.target) && !botaoPerfil.contains(event.target)) {
+        menuPerfil.classList.remove('ativo');
+    }
+});
+
+
 // Dados de exemplo
 const rncs = [
     {
