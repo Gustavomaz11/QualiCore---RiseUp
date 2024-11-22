@@ -44,36 +44,34 @@
                 <input type="text" id="busca" class="campoBusca" placeholder="Procurar">
                 <i class="bi bi-search iconeBusca"></i>
             </div>
-            <div class="containerBtnAndInfo">
-                <div class="botoesAcao">
-                    <button type="button" id="btnMenu" class="botaoIcone"><i class="bi bi-list"></i></button>
-                    <button type="button" class="botaoIcone"><i class="bi bi-bell"></i></button>
-                    <button type="button" class="botaoIcone" id="cxEntradaBtn"><i class="bi bi-envelope"></i></button>
+            <div class="botoesAcao">
+                <button type="button" class="botaoIcone"><i class="bi bi-bell"></i></button>
+                <button type="button" class="botaoIcone" id="cxEntradaBtn"><i class="bi bi-envelope"></i></button>  
+            </div>
+            <hr/>
+            <div class="infoUsuario">
+                <span id="nomeUsuario">Olá, Gustavo</span>
+                <div class="avatarUsuario" id="botaoPerfil">
+                    <img src="/api/placeholder/150/150" id="avatarImage">
+                        <i class="bi bi-person" id="avatarIcon"></i>
                 </div>
-                <hr/>
-                <div class="infoUsuario">
-                    <span>Olá, <span id="nome">Gustavo</span></span>
-                    <div class="avatarUsuario" id="botaoPerfil">
-                        <i class="bi bi-person"></i>
-                    </div>
-                    <div class="dropdownPerfil" id="menuPerfil">
-                        <a class="itemDropdown" id="meuPerfilBtn">
-                            <i class="bi bi-person-circle"></i>
-                            Meu Perfil
-                        </a>
-                        <a href="#" class="itemDropdown">
-                            <i class="bi bi-bell"></i>
-                            Notificações
-                        </a>
-                        <div class="separadorDropdown"></div>
-                        <a href="index.html" class="itemDropdown">
-                            <i class="bi bi-box-arrow-right"></i>
-                            Sair
-                        </a>
-                    </div>
+                <div class="dropdownPerfil" id="menuPerfil">
+                    <a class="itemDropdown" id="meuPerfilBtn">
+                        <i class="bi bi-person-circle"></i>
+                        Meu Perfil
+                    </a>
+                    <a href="#" class="itemDropdown">
+                        <i class="bi bi-bell"></i>
+                        Notificações
+                    </a>
+                    <div class="separadorDropdown"></div>
+                    <a href="index.html" class="itemDropdown">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Sair
+                    </a>
                 </div>
             </div>
-    </section>
+        </section>
         <nav class="navPrincipal"></nav>
     
         <div class="container">
@@ -81,7 +79,7 @@
                 <div class="profile-header">
                     <button class="edit-button" onclick="toggleEdit()">Editar Perfil</button>
                     <div class="profile-picture-container">
-                        <img src="/api/placeholder/150/150" alt="Foto de Perfil" class="profile-picture" id="profilePicture">
+                        <img src="/api/placeholder/150/150" class="profile-picture" id="profilePicture">
                         <button class="change-photo" onclick="document.getElementById('photoInput').click()">📷</button>
                         <input type="file" id="photoInput" accept="image/*" onchange="changeProfilePicture(this)">
                     </div>
@@ -92,6 +90,18 @@
                     <div class="info-group">
                         <span class="info-label">Usuário</span>
                         <div class="info-value" contenteditable="false" id="username">joao.silva</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Nome Completo</span>
+                        <div class="info-value" contenteditable="false" id="nomeCompleto">João Souza Silva</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Telefone</span>
+                        <div class="info-value" contenteditable="false" id="telefone">(79)9xxxx-xxxx</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Instituição</span>
+                        <div class="info-value" contenteditable="false" id="instituicao">Hemose</div>
                     </div>
                     <div class="info-group">
                         <span class="info-label">Setor</span>

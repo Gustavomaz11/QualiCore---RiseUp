@@ -6,7 +6,7 @@
 .navPrincipal {
     background: linear-gradient(to right, var(--cor-principal),var(--cor-principal) ,#000);
     color: white;
-    padding: 1rem 2rem;
+    padding: 1rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -21,6 +21,7 @@
     font-size: clamp(1em,6vw,1.4em);
     font-weight: bold;
 }
+
 
 .add-btn {
     background-color: #27ae60;
@@ -213,4 +214,41 @@
 
 #radioContainer label {
     margin: 0px;
+}
+
+/* Filtro */
+.filtro {
+    display: flex;
+    justify-content: center;  
+    align-items: center;     
+    margin: 20px 0;          
+}
+
+#filtroStatus {
+    width: 90px;              
+    padding: 10px;             
+    font-size: 16px;          
+    border-radius: 8px;        
+    border: 1px solid #ccc;    
+    background-color: #f9f9f9; 
+    color: var(--cor-principal);       
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    appearance: none;        
+    cursor: pointer;          
+}
+
+#filtroStatus:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+#filtroStatus option {
+    font-size: 16px;
+    padding: 10px;
+}
+
+#filtroStatus:hover {
+    border-color: #007bff;
+    background-color: #eef5ff;
 }
