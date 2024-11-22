@@ -9,6 +9,7 @@ const DivlinhaDoTempo = document.querySelector('.linhaDoTempo')
 const detalhesRncDoModal = document.querySelector('.detalhesRncDoModal')
 const btnFormulario = document.querySelector('#btnFormulario')
 const btnLinhaDoTempo = document.querySelector('#btnLinhaDoTempo')
+const cxEntradaBtn = document.querySelector('#cxEntradaBtn')
 
 let atualActive
 
@@ -116,34 +117,30 @@ function disableScroll() {
     document.body.removeEventListener('touchmove', evtDefault)
   }
 
-// função que deixa a cor da carta laranja caso tenha alguam msg não vista
-function atualizandoUser (user, funcionarios){
-    user = localStorage.getItem('login')
-    if(user != null)
-        user = JSON.parse(user)
 
-    funcionarios = localStorage.getItem('funcionarios')
-    if(funcionarios != null)
-        funcionarios = JSON.parse(funcionarios)
 
-    funcionarios?.map((funcionario)=>{
-        if(funcionario.email == user.email){
-            funcionario.mensagens.map((menssagem)=>{
-                if(menssagem.lida == false){
-                    if(cxEntradaBtn.className == 'botaoIcone novaMenssagem') return
-                    else
-                        cxEntradaBtn.classList.add('novaMenssagem')
-                }
-                else{
-                    cxEntradaBtn.classList.remove('novaMenssagem')
-                }
-            })
-        }
-    })
+async function handleGetMyCarLetter (){
+    try {
+        const novaMenssagemJson = await fetch(`http://localhost:3333/menssagem/msgNova/${user._id}`)
+        const novaMenssagem = await novaMenssagemJson.json()
+        notificacaoNovaMsg(novaMenssagem)
+    } catch (error) {
+        console.log(error)
+    } finally {
+        setInterval(handleGetMyCarLetter,5000)
+    }
 }
 
-// atualizandoUser(user,funcionarios)
-// setInterval(atualizandoUser(user, funcionarios),5000)
+// função que deixa a cor da carta laranja caso tenha alguam msg não vista
+function notificacaoNovaMsg (novaMsg){
+    if(novaMsg){
+        cxEntradaBtn.classList.add('novaMenssagem')
+    }else{
+        cxEntradaBtn.classList.remove('novaMenssagem')
+    }
+}
+
+handleGetMyCarLetter()
 
 async function handleGetSolicitacao (){
     try {
