@@ -130,6 +130,29 @@ async function handleGetDepartamento (){
     }
 }
 
+async function handleSetDepartamento(body){
+    try {
+        const responseJson = await fetch('http://localhost:3333/departamento/add',{
+            method:"POST",
+            headers:{
+                "Content-Type": "application/json"
+            },
+            body:JSON.stringify(body)
+        })
+        
+        if(responseJson.status == 200){
+            alert('Departamento criado com sucesso')
+            window.location.reload(true)
+            return
+        }
+
+        const response = await responseJson.json()
+        alert(response.message)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 const listaSidebarBtn = [dashBtn, relatorioBtn, rncBtn, dashDetalhadoBtn, monitoramentoBtn, departamentoBtn, usuariosBtn, cxEntradaBtn, meuPerfilBtn]
 const urlSidebar = [
     'homePage.html',
@@ -226,33 +249,26 @@ function closeModal() {
 function addDepartment(event) {
     event.preventDefault();
     const name = document.getElementById('departmentName').value;
-    const sigla = document.querySelector('#siglaDepartamento')
+    const sigla = document.querySelector('#siglaDepartamento').value
     let ativoInput = document.querySelectorAll('input[type="radio"]')
-    const email = document.getElementById('email').value;
+    const emailGerente = document.getElementById('email').value;
     let ativo = null
     ativoInput.forEach((ele)=> {
         if(ele.checked)
             ativo = ele.value
     })
 
+    
     const novoDepartamento = {
         nome:name,
         sigla,
-        email,
+        emailGerente,
         ativo
     }
-
-    const newDepartment = {
-        id: departments.length + 1,
-        name: name,
-        manager: email,
-        status: 'active'
-    };
-
-    departments.push(newDepartment);
-    renderDepartments();
-    closeModal();
-    event.target.reset();
+    
+    console.log(novoDepartamento)
+    handleSetDepartamento(novoDepartamento)
+    // event.target.reset();
 }
 
 function removeDepartment(id) {
