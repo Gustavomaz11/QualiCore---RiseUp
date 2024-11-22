@@ -16,6 +16,24 @@ let lengthRnc = localStorage.getItem('lengthRnc')
 if(lengthRnc != null)
     lengthRnc = JSON.parse(lengthRnc)
 
+function showName (nomeCompleto){
+    while (nomeCompleto.length > 13) {
+        const partes = nomeCompleto.trim().split(" ")
+        if (partes.length > 1) {
+            partes.pop()
+            nomeCompleto = partes.join(" ")
+            if(partes[partes.length-1].length <= 2){
+                partes.pop()
+                nomeCompleto = partes.join(" ")
+            }
+        } else {
+          nomeCompleto = nomeCompleto.substring(0, 13)
+          break
+        }
+      }
+      return nomeCompleto
+}
+
 // pegando usuario
 let user = localStorage.getItem('login')
 if(user != null)
@@ -25,7 +43,37 @@ if(user == null)
     window.location.href = 'index.html';
 
 const nome = document.querySelector('#nome')
-nome.innerText = user.nome?user.nome:'xxxx'
+nome.innerText = user.nome?showName(user.nome):'xxxx'
+
+async function handleGetRnc (){
+    try {
+        const rncJson = await fetch('http://localhost:3333/rnc')
+        const rnc = await rncJson.json()
+        return rnc
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleGetDepartamento (){
+    try {
+        const departamentoJson = await fetch('http://localhost:3333/departamento')
+        const departamento = await departamentoJson.json()
+        return departamento
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleGetRncConcluidas (){
+    try {
+        const concluidasJson = await fetch('http://localhost:3333/rncConcluidas')
+        const concluidas = await concluidasJson.json()
+        return concluidas
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 // pegando funcionarios
 let funcionarios = localStorage.getItem('funcionarios')
@@ -48,39 +96,8 @@ btnlimparCash.addEventListener('click',()=>{
 
 
 // função que deixa a cor da carta laranja caso tenha alguam msg não vista
-function atualizandoUser (user, funcionarios){
-    user = localStorage.getItem('login')
-    if(user != null)
-        user = JSON.parse(user)
 
-    console.log(user)
-
-    funcionarios = localStorage.getItem('funcionarios')
-    if(funcionarios != null)
-        funcionarios = JSON.parse(funcionarios)
-
-    funcionarios?.map((funcionario)=>{
-        if(funcionario.email == user.email){
-            funcionario.mensagens.map((menssagem)=>{
-                console.log(menssagem)
-                if(menssagem.lida == false){
-                    if(cxEntradaBtn.className == 'botaoIcone novaMenssagem') return
-                    else
-                        cxEntradaBtn.classList.add('novaMenssagem')
-                }
-                else{
-                    cxEntradaBtn.classList.remove('novaMenssagem')
-                }
-            })
-        }
-    })
-}
-
-atualizandoUser(user,funcionarios)
-setInterval(atualizandoUser(user, funcionarios),5000)
-
-
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded',async function() {
     const botaoPerfil = document.getElementById('botaoPerfil');
     const menuPerfil = document.getElementById('menuPerfil');
     const modal = document.querySelector(".modalPerfil");
@@ -97,6 +114,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const cxEntradaBtn = document.querySelector('#cxEntradaBtn')
     const meuPerfilBtn = document.querySelector('#meuPerfilBtn')
 
+    const rnc =await handleGetRnc()
+    const concluidas =await handleGetRncConcluidas()
+    const departamentos = await handleGetDepartamento()
+    const todasRnc = [...rnc,...concluidas]
 
     const listaSidebarBtn = [dashBtn, relatorioBtn, rncBtn, dashDetalhadoBtn, monitoramentoBtn, departamentoBtn, usuariosBtn, cxEntradaBtn, meuPerfilBtn]
     const urlSidebar = [
@@ -195,8 +216,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Gráfico de barras
     const ctx = document.getElementById('meuGrafico').getContext('2d');
-    const labels = ['Douglas Abilio - TI', 'Juliana - Enfermaria', 'Silvia - Ambulatório', 'Maria - Laboratório', 'Marcelo - Coleta', 'Rose - Recepção'];
-    const data = [12, 19, 3, 5, 2, 3];
+    // let labels
+    console.log(rnc)
+    console.log(concluidas)
+    console.log(departamentos)
+
+    const labels = []
+    const data = Array.from({length:departamentos.length},()=> 0)
+    departamentos.map((currentDepartamentos)=>{
+        labels.push(`${showName(currentDepartamentos.nome)} - ${currentDepartamentos.sigla}`)
+    })
+    todasRnc.map((currentRnc)=>{
+        const index = labels.findIndex(departamentos => departamentos.includes(currentRnc.criador.departamento.sigla))
+        data[index]+=1
+    })
 
     new Chart(ctx, {
         type: 'bar',
@@ -266,8 +299,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Gráfico de rosca
     const ctxRosca = document.getElementById('meuGraficoRosca').getContext('2d');
-    const labelsRosca = ['Resolvido', 'Em Aberto'];
-    const dataRosca = [3, 12];
+    const labelsRosca = ['Em aberto', 'Resolvido'];
+    const dataRosca = [rnc.length, concluidas.length];
     
     new Chart(ctxRosca, {
         type: 'doughnut',
@@ -311,8 +344,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Gráfico de linhas
     const ctxLinhas = document.getElementById('meuGraficoLinhas').getContext('2d');
-    const labelsLinhas = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'];
-    const dataLinhas = [3, 10, 5, 7, 12, 15];
+    const meses = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro"
+    ]
+    const date = new Date()
+    const mes = date.getMonth()+1
+    console.log(mes)
+    const labelsLinhas = meses.slice(0,mes)
+    const dataLinhas = Array.from({length:mes+1},()=> 0)
+    concluidas.map((currentRnc)=>{
+        let indexMesRnc = Number(currentRnc.data.split("/")[1])-1
+        dataLinhas[indexMesRnc]+= 1
+    })
     
     new Chart(ctxLinhas, {
         type: 'line',
@@ -383,8 +437,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctxBar = document.getElementById('meuGraficoBar').getContext('2d');
 
     // Defina as categorias e dados correspondentes
-    const labelsBar = ['Processos', 'Insumos', 'Equipamentos', 'Infraestrutura', 'Recursos Humanos'];
-    const dataBar = [12, 5, 9, 1, 4]; // Dados de não conformidades
+    const objDataBar = [
+        {
+            nome:"Processos / Insumos",
+            qtn:0
+        },
+        {
+            nome:"Auditoria Externa",
+            qtn:0
+        },
+        {
+            nome:"Análise Crítica do Sistema",
+            qtn:0
+        },
+        {
+            nome:"Reclamação de Cliente",
+            qtn:0
+        },
+        {
+            nome:"Produto não Conforme",
+            qtn:0
+        },
+        {
+            nome:"Acidente / Incidente",
+            qtn:0
+        },
+        {
+            nome:"Oportunidade de Melhoria",
+            qtn:0
+        },
+        {
+            nome:"Auditoria Interna",
+            qtn:0
+        }
+    ]
+    const labelsBar = [];
+    const dataBar = []; // Dados de não conformidades
+
+    todasRnc.map((currentRnc)=>{
+        objDataBar.map((dataBarObj)=>{
+            labelsBar.push(showName(dataBarObj.nome))
+            if(currentRnc.origem == dataBarObj.nome){
+                dataBarObj.qtn+= 1
+            }
+            dataBar.push(dataBarObj.qtn)
+        })
+    })
+
+    console.log(dataBar)
 
     new Chart(ctxBar, {
         type: 'bar', // Mudei para 'bar'
@@ -451,8 +551,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     const ctxArea = document.getElementById('meuGraficoArea').getContext('2d');
-    const labelsArea = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'];
-    const dataArea = [2, 4, 6, 5, 8, 10];
+    // const labelsArea = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'];
+    // const dataArea = [2, 4, 6, 5, 8, 10];
+
+    const labelsArea = meses.slice(0,mes)
+    const dataArea = Array.from({length:mes+1},()=> 0)
+    todasRnc.map((currentRnc)=>{
+        let indexMesRnc = Number(currentRnc.data.split("/")[1])-1
+        if(currentRnc.status == "concluido"){
+            dataArea[indexMesRnc]+= 1
+        }else{
+            dataArea[indexMesRnc]-= 1
+        }
+    })
 
     // Usar a função generateColors para cada parte do gráfico
     const backgroundColors = labelsArea.map((_, index) => generateColors(index));

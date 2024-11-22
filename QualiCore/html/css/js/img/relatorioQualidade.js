@@ -27,6 +27,24 @@ let lengthRnc = localStorage.getItem('lengthRnc')
 if(lengthRnc != null)
     lengthRnc = JSON.parse(lengthRnc)
 
+function showName (nomeCompleto){
+    while (nomeCompleto.length > 13) {
+        const partes = nomeCompleto.trim().split(" ")
+        if (partes.length > 1) {
+            partes.pop()
+            nomeCompleto = partes.join(" ")
+            if(partes[partes.length-1].length <= 2){
+                partes.pop()
+                nomeCompleto = partes.join(" ")
+            }
+        } else {
+          nomeCompleto = nomeCompleto.substring(0, 13)
+          break
+        }
+      }
+      return nomeCompleto
+}
+
 // pegando usuario
 let user = localStorage.getItem('login')
 if(user != null)
@@ -36,7 +54,17 @@ if(user == null)
     window.location.href = 'index.html';
 
 const nome = document.querySelector('#nome')
-nome.innerText = user.nome?user.nome:'xxxx'
+nome.innerText = user.nome?showName(user.nome):'xxxx'
+
+async function handleGetRncConcluidas (){
+    try {
+        const concluidasJson = await fetch('http://localhost:3333/rncConcluidas')
+        const concluidas = await concluidasJson.json()
+        return concluidas
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 // pegando funcionarios
 let funcionarios = localStorage.getItem('funcionarios')
@@ -60,36 +88,6 @@ btnlimparCash.addEventListener('click',()=>{
 
 
 // função que deixa a cor da carta laranja caso tenha alguam msg não vista
-function atualizandoUser (user, funcionarios){
-    user = localStorage.getItem('login')
-    if(user != null)
-        user = JSON.parse(user)
-
-    console.log(user)
-
-    funcionarios = localStorage.getItem('funcionarios')
-    if(funcionarios != null)
-        funcionarios = JSON.parse(funcionarios)
-
-    funcionarios?.map((funcionario)=>{
-        if(funcionario.email == user.email){
-            funcionario.mensagens.map((menssagem)=>{
-                console.log(menssagem)
-                if(menssagem.lida == false){
-                    if(cxEntradaBtn.className == 'botaoIcone novaMenssagem') return
-                    else
-                        cxEntradaBtn.classList.add('novaMenssagem')
-                }
-                else{
-                    cxEntradaBtn.classList.remove('novaMenssagem')
-                }
-            })
-        }
-    })
-}
-
-atualizandoUser(user,funcionarios)
-setInterval(atualizandoUser(user, funcionarios),5000)
 
 
 const listaSidebarBtn = [dashBtn, relatorioBtn, rncBtn, dashDetalhadoBtn, monitoramentoBtn, departamentoBtn, usuariosBtn, cxEntradaBtn]
@@ -123,7 +121,7 @@ document.addEventListener('click', function(event) {
 
 
 // Dados de exemplo
-const rncs = [
+let rncs = [
     {
         id: 'NC001',
         sector: 'Produção',
@@ -157,36 +155,37 @@ const rncs = [
 ];
 
 function createRNCCard(data) {
+    console.log(data)
     const card = document.createElement('div');
     card.className = 'rnc-card';
     card.innerHTML = `
         <div class="rnc-header">
             <div>
-                <h3 class="rnc-title">RNC ${data.id}</h3>
-                <span class="severity-badge severity-${data.severity}">
-                    ${getSeverityText(data.severity)}
+                <h3 class="rnc-title">RNC ${data._id}</h3>
+                <span class="severity-badge severity-${data.nivelSeveridade}">
+                    ${getSeverityText(data.nivelSeveridade)}
                 </span>
             </div>
         </div>
         <div class="rnc-details">
             <div class="rnc-detail-item">
                 <span class="rnc-detail-label">Setor:</span>
-                <span>${data.sector}</span>
+                <span>${data.criador.departamento.nome}</span>
             </div>
             <div class="rnc-detail-item">
                 <span class="rnc-detail-label">Gestor:</span>
-                <span>${data.manager}</span>
+                <span title=${data.criador.departamento.gerente}>${showName(data.criador.departamento.gerente)}</span>
             </div>
             <div class="rnc-detail-item">
                 <span class="rnc-detail-label">Reportado por:</span>
-                <span>${data.reporter}</span>
+                <span title=${data.criador.nome}>${showName(data.criador.nome)}</span>
             </div>
         </div>
         <div class="involved-people">
             <span class="rnc-detail-label">Envolvidos:</span>
             <div class="avatar-group">
-                ${data.involvedPeople.map(person => `
-                    <div class="avatar">${person}</div>
+                ${data.pessoasAnexadas.map(person => `
+                    <div class="avatar" title=${person.nome}>${person.avatar}</div>
                 `).join('')}
             </div>
         </div>
@@ -196,9 +195,9 @@ function createRNCCard(data) {
 
 function getSeverityText(severity) {
     const severityMap = {
-        high: 'Alto',
-        medium: 'Médio',
-        low: 'Baixo'
+        alta: 'Alta',
+        media: 'Média',
+        baixa: 'Baixa'
     };
     return severityMap[severity] || severity;
 }
@@ -212,8 +211,11 @@ function closeModal() {
 }
 
 // Inicialização
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const container = document.getElementById('rncGrid');
+    
+    rncs = await handleGetRncConcluidas()
+    console.log(rncs)
     rncs.forEach(rnc => {
         container.appendChild(createRNCCard(rnc));
     });

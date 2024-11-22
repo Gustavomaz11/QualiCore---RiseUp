@@ -9,16 +9,42 @@ const cxEntradaBtn = document.querySelector('#cxEntradaBtn')
 const meuPerfilBtn = document.querySelector('#meuPerfilBtn')
 const DivlinhaDoTempo = document.querySelector('.linhaDoTempo')
 const bodyTabelaRnc = document.querySelector('#bodyTabelaRNC')
-const selectQuem = document.querySelector('#quem')
 const modal = document.getElementById("rncDetailsModal");
 const rncNumber = document.querySelector('#rncNumber')
 const notificationsList = document.getElementById('notificationsList');
+const modalFooter = document.querySelector('.modal-footer')
+const btnFormulario = document.querySelector('#btnFormulario')
+const btnLinhaDoTempo = document.querySelector('#btnLinhaDoTempo')
+const detalhesRncDoModal = document.querySelector('.detalhesRncDoModal')
+const name = document.querySelector('#nome')
+let atualActive
 
+// inputs modal
+const selectQuem = document.querySelector('#quem')
+const inputOque = document.querySelector('#oQue')
+const inputQuando = document.querySelector('#quando')
+const inputOnde = document.querySelector('#onde')
+const inputComo = document.querySelector('#como')
+const inputPorque = document.querySelector('#porque')
+const inputCusto = document.querySelector('#custo')
+const inputEvid = document.querySelector('#evid')
 
 //tab btns
 const detalhamentoRncBtn = document.querySelector('#detalhamentoBtn');
 const andamentoBtn = document.querySelector('#andamentoBtn');
 const conclusaoBtn = document.querySelector('#conclusaoBtn');
+
+btnFormulario.addEventListener('click',()=>{
+    detalhesRncDoModal.classList.remove('sumirConteudoModal')
+    modalFooter.classList.remove('sumirConteudoModal')
+    DivlinhaDoTempo.classList.remove('showForm')
+})
+
+btnLinhaDoTempo.addEventListener('click',()=>{
+    detalhesRncDoModal.classList.add('sumirConteudoModal')
+    modalFooter.classList.add('sumirConteudoModal')
+    DivlinhaDoTempo.classList.add('showForm')
+})
 
 const btnMenu = document.querySelector('#btnMenu')
 btnMenu.addEventListener('click',()=>{
@@ -31,6 +57,24 @@ btnCloneMenu.addEventListener('click',()=>{
     document.querySelector('aside').classList.remove('openMenu')
     document.querySelector('main').style = 'display: block;'
 })
+// função para formatar o nome sem quebrar o estilo
+function showName (nomeCompleto){
+    while (nomeCompleto.length > 13) {
+        const partes = nomeCompleto.trim().split(" ")
+        if (partes.length > 1) {
+            partes.pop()
+            nomeCompleto = partes.join(" ")
+            if(partes[partes.length-1].length <= 2){
+                partes.pop()
+                nomeCompleto = partes.join(" ")
+            }
+        } else {
+          nomeCompleto = nomeCompleto.substring(0, 13)
+          break
+        }
+      }
+      return nomeCompleto
+}
 
 // pegano o user
 let user = localStorage.getItem('login')
@@ -40,43 +84,192 @@ if(user != null)
 if(user == null)
     window.location.href = 'index.html';
 
+nome.innerText = showName(user.nome)
+
 // pegano os funcionarios
-let funcionarios = localStorage.getItem('funcionarios')
-funcionarios = JSON.parse(funcionarios)
+let funcioanrios
 
-function atualizandoUser (user, funcionarios){
-    user = localStorage.getItem('login')
-    if(user != null)
-        user = JSON.parse(user)
-
-    funcionarios = localStorage.getItem('funcionarios')
-    if(funcionarios != null)
-        funcionarios = JSON.parse(funcionarios)
-
-    funcionarios?.map((funcionario)=>{
-        if(funcionario.email == user.email){
-            funcionario.mensagens.map((menssagem)=>{
-                if(menssagem.lida == false){
-                    if(cxEntradaBtn.className == 'botaoIcone novaMenssagem') return
-                    else
-                        cxEntradaBtn.classList.add('novaMenssagem')
-                }
-                else{
-                    cxEntradaBtn.classList.remove('novaMenssagem')
-                }
-            })
-        }
-    })
+async function handleGetUsuariosAtivos (){
+    try {
+        const ativosJson = await fetch('http://localhost:3333/usuarios/ativos')
+        let ativos = await ativosJson.json()
+        funcionarios = ativos
+    } catch (error) {
+        console.log(error)
+    }
 }
 
-atualizandoUser(user,funcionarios)
-setInterval(atualizandoUser(user, funcionarios),5000)
+handleGetUsuariosAtivos()
 
-// jeito de atualizar o user
-funcionarios.map((funcionario)=>{
-    if(funcionario.email == user.email)
-        user = funcionario
-})
+// atualizandoUser(user,funcionarios)
+// setInterval(atualizandoUser(user, funcionarios),5000)
+
+async function handleGetMenssagens (){
+    try {
+        const menssagensJson = await fetch(`http://localhost:3333/menssagem/minhasMsg/${user?._id}`)
+        const menssagens = await menssagensJson.json()
+        return menssagens
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleGetRncById (id){
+    try {
+        const rncJson = await fetch(`http://localhost:3333/rnc/${id}`)
+        const rnc = await rncJson.json()
+        return rnc
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleGetRncConcluidasById (id){
+    try {
+        const rncConcluidaJson = await fetch(`http://localhost:3333/rncConcluidas/${id}`)
+        const rncConcluida = await rncConcluidaJson.json()
+        return rncConcluida
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleMarkAsRead(body){
+    try {
+        const responseJson = await fetch(`http://localhost:3333/menssagem/marcarLida`,{
+            method:"PUT",
+            headers:{
+                "Content-type":"application/json"
+            },
+            body:JSON.stringify(body)
+        })
+
+        if(responseJson.status == 200){
+            let response = await responseJson.json()
+            alert(response.message)
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleGetMyCarLetter (){
+    try {
+        const novaMenssagemJson = await fetch(`http://localhost:3333/menssagem/msgNova/${user._id}`)
+        const novaMenssagem = await novaMenssagemJson.json()
+        notificacaoNovaMsg(novaMenssagem)
+    } catch (error) {
+        console.log(error)
+    } finally {
+        setInterval(handleGetMyCarLetter,30000)
+    }
+}
+
+// função que deixa a cor da carta laranja caso tenha alguam msg não vista
+function notificacaoNovaMsg (novaMsg){
+    if(novaMsg){
+        cxEntradaBtn.classList.add('novaMenssagem')
+    }else{
+        cxEntradaBtn.classList.remove('novaMenssagem')
+    }
+}
+
+handleGetMyCarLetter()
+
+async function changeDetalhamentoRnc (changeRnc){
+    try {
+        const rncJson = await fetch('http://localhost:3333/rnc/mudarInfo',{
+            method:"PATCH",
+            headers:{
+                "Content-Type": "application/json"
+            },
+            body:JSON.stringify(changeRnc)
+        })
+
+        if(rncJson.status == 200){
+            alert('Rnc aceita com sucesso')
+            window.location.reload(true) 
+            return
+        }
+
+        let rnc = await rncJson.json()
+
+        console.log(rnc)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleAdd5w2h (body){
+    try {
+        const respostaJson = await fetch('http://localhost:3333/rnc/add5w2h',{
+            method:"PATCH",
+            headers:{
+                "Content-Type": "application/json"
+            },
+            body:JSON.stringify(body)
+        })
+
+        if(respostaJson.status == 200){
+            alert('5w2h adicionado com sucesso')
+            window.location.reload(true) 
+            return
+        }
+
+        let resposta = await respostaJson.json()
+
+        console.log(resposta)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleEdit5w2h (body){
+    try {
+        const respostaJson = await fetch('http://localhost:3333/rnc/edit5w2h',{
+            method:"PATCH",
+            headers:{
+                "Content-Type": "application/json"
+            },
+            body:JSON.stringify(body)
+        })
+
+        if(respostaJson.status == 200){
+            alert('5w2h editado com sucesso')
+            window.location.reload(true) 
+            return
+        }
+
+        let resposta = await respostaJson.json()
+
+        console.log(resposta)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function handleConclusao (body){
+    try {   
+        const respostaJson = await fetch('http://localhost:3333/rncConcluidas/conclusao',{
+            method:"POST",
+            headers:{
+                "Content-type":"application/json"
+            },
+            body:JSON.stringify(body)
+        })
+
+        if(respostaJson.status == 201){
+            alert('Rnc marcada como concluida')
+            window.location.reload(true) 
+            return
+        }
+
+        let resposta = await respostaJson.json()
+        console.log(resposta)
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 const listaSidebarBtn = [dashBtn, relatorioBtn, rncBtn, dashDetalhadoBtn, monitoramentoBtn, departamentoBtn, usuariosBtn, cxEntradaBtn, meuPerfilBtn]
 const urlSidebar = [
@@ -97,46 +290,30 @@ for(let i = 0; i < listaSidebarBtn.length; i++) {
     })
 }
 
-function marcarComoLida (notification) {
-    let mudou = false
+async function renderNotifications() {
+    let mensagens = await handleGetMenssagens()
     
-    funcionarios.map((funcionario)=>{
-        funcionario.mensagens.forEach((mensagem)=>{
-        if(notification?.rnc?.numero == mensagem.rnc.numero){
-            notification.lida = true
-            mensagem = notification
-            mudou = true
-        }
-        })
-    })
-    console.log(mudou)
-
-    if(mudou){
-        localStorage.setItem('funcionarios', JSON.stringify(funcionarios))
-        funcionarios = localStorage.getItem('funcionarios')
-        funcionarios = JSON.parse(funcionarios)
-        console.log(funcionarios)
-    }
-}
-
-function renderNotifications() {
-    let user = localStorage.getItem('login')
-    user = JSON.parse(user)
-    funcionarios.map((funcionario)=>{
-        if(funcionario.email == user.email){
-            user = funcionario
-        }
-    })
     notificationsList.innerHTML = '';
-    user?.mensagens.forEach(notification => {
+    mensagens.forEach(async notification => {
+        console.log(notification)
+        let rnc 
+        rnc =  await handleGetRncById(notification.idRnc)
+        if(rnc == null){
+            rnc = await handleGetRncConcluidasById(notification.idRnc)
+        }
+        console.log(rnc)
         const card = document.createElement('div');
         card.className = `notification-card ${notification.lida ? '' : 'unread'}`;
-        card.addEventListener('click', ()=>{
-            openModalOnDoubleClick(notification.rnc)
-            marcarComoLida(notification)
+        card.addEventListener('dblclick', ()=>{
+            openModalOnDoubleClick(rnc)
+            if(!notification.lida){
+                handleMarkAsRead({idMenssagem:notification._id})
+            }
+                
         })
-        const statusText = notification.rnc.status
-        const statusClass = notification.rnc.status
+        
+        const statusText = rnc.status
+        
         card.innerHTML = `
             <div class="notification-header">
                 <div class="sender-info">
@@ -146,21 +323,21 @@ function renderNotifications() {
                         <span class="notification-time">${notification.data + " - " + notification.hora}</span>
                     </div>
                 </div>
-                <span class="nc-number">${notification.rnc.numero}</span>
+                <span class="nc-number">${rnc._id}</span>
             </div>
             <div class="notification-content">
                 ${notification.menssagem}
             </div>
             <div class="involved-users">
                 <div class="involved-avatars">
-                    ${notification.rnc.pessoasAnexadas?.map(pessoas => 
+                    ${rnc.pessoasAnexadas?.map(pessoas => 
                         `<div class="involved-avatar" title="${pessoas.nome}">${pessoas.avatar}</div>`
                     ).join('')}
                 </div>
-                <span class="involved-count">${notification.rnc.pessoasAnexadas?.length} envolvidos</span>
+                <span class="involved-count">${rnc.pessoasAnexadas?.length} envolvidos</span>
             </div>
             <div class="notification-footer">
-                <span class="status-badge ${statusClass}">${statusText}</span>
+                <span class="status-badge">${statusText}</span>
                 <div class="action-buttons">
                     <button class="action-btn secondary-btn">Ignorar</button>
                     <button class="action-btn primary-btn">Ver detalhes</button>
@@ -192,8 +369,9 @@ function closeModal() {
 // Inicializa a renderização das notificações
 renderNotifications();
 
-function openModalOnDoubleClick(rncData) {
-    console.log(rncData)
+async function openModalOnDoubleClick(rncData) {
+    document.body.style = 'overflow:hidden;'
+    const saveBtn = document.getElementById("saveBtn");
     const data = new Date()
     let dia = data.getDate() < 10?"0"+data.getDate():data.getDate()
     let mes = data.getMonth() + 1 < 10?"0"+data.getMonth():data.getMonth()+1
@@ -202,6 +380,9 @@ function openModalOnDoubleClick(rncData) {
     let minutos = data.getMinutes() < 10?"0"+data.getMinutes():data.getMinutes()
     let fullHora =  `${hora}:${minutos}`
     let fullData =  `${dia}/${mes}/${ano}`
+
+    console.log(rncData)
+
     let {linhaDoTempo} = rncData
     DivlinhaDoTempo.innerHTML = ''
     linhaDoTempo.map((mudanca,index)=>{
@@ -209,18 +390,18 @@ function openModalOnDoubleClick(rncData) {
         div.classList.add('itemLinhaDoTempo')
         div.innerHTML = `
             <div class="conteudoLinhaDoTempo">
-                <p>${mudanca.data} - ${mudanca.hora}<br>${index  == 0?'Aberto por ' + mudanca.criador.nome: mudanca.menssagem}</p>
+                <p>${mudanca.data} - ${mudanca.hora}<br>${index  == 0?'Aberto por ' + mudanca.criador.nome:mudanca.criador.nome + " "+ mudanca.acao}</p>
             </div>
         `
         DivlinhaDoTempo.appendChild(div)
     })
-    // rncData.anexos = rncData.anexos.length>1?rncData.anexos.split(', '):rncData.anexos[0]
+    // rncData.anexos = rncData.anexos?.split(',')
     bodyTabelaRnc.innerHTML = ''
-    rncData.anexos.map((anexo)=>{
+    rncData.anexos?.map((anexo)=>{
         const tr = document.createElement('tr')
         tr.innerHTML = `
             <td>${anexo}</td>
-            <td>${rncData.dataHora}</td>
+            <td>${e.getAttribute("data-data")}</td>
             <td>
                 <button class="verBtn">Ver</button>
                 <button class="aceitarBtn">Aceitar</button>
@@ -230,168 +411,404 @@ function openModalOnDoubleClick(rncData) {
 
         bodyTabelaRnc.appendChild(tr)
     })
-    document.getElementById("rncNumber").textContent = rncData.numero;
+    document.getElementById("rncNumber").textContent = rncData._id;
     document.querySelector('#data-hora').value = rncData.data + " - " + rncData.hora;
     document.querySelector('#origem').value = rncData.origem;
-    document.querySelector('#setor-autuante').value = rncData.setorAutuante;
-    document.querySelector('#enquadramento').value = rncData.enquadramento;
+    document.querySelector('#setor-autuante').value = rncData.setorAutuante.nome
+    document.querySelector('#enquadramento').value = rncData.enquadramento
+    const dataPrevistaConclusao = document.querySelector('#dataPrevista')
+    dataPrevistaConclusao.value = rncData.dataPrevista
+
+    const acaoEficacia = document.getElementsByName('acaoEficacia')
+    acaoEficacia.forEach((currentAcaoEficacia)=>{
+        if(currentAcaoEficacia.value == rncData.acaoDaEficacia)
+            currentAcaoEficacia.checked = true
+    })
     const tipo = document.getElementsByName('tipoRnc')
-    tipo.value = rncData.tipo
+    tipo.forEach((currentTipo)=>{
+        if(currentTipo.value == rncData.tipo)
+            currentTipo.checked = true
+    })
     const setorAtuar = document.querySelector('#setor-atuar')
-    setorAtuar.value = rncData.setorAtuar
+    setorAtuar.value = rncData.setorAtuar == null ?  rncData.setorAtuar : rncData.setorAtuar._id
     const severidade = document.querySelector('#severidade')
-    severidade.value = rncData.severidade
+    severidade.value = rncData.nivelSeveridade
     const status = document.querySelector('#status')
     status.value = rncData.status
-    rncNumber.value = rncData.numero
-    const newSaveBtn = saveBtn.cloneNode(true);  // Clona o botão para remover os eventos antigos
-    newSaveBtn.textContent = 'teste'
+    inputComo.value = rncData.como == "null" ? null : rncData.como
+    inputCusto.value = rncData.custo
+    inputOnde.value = rncData.onde == "null" ? null : rncData.onde
+    inputOque.value = rncData.oque == "null" ? null : rncData.oque
+    inputPorque.value = rncData.porque == "null" ? null : rncData.porque
+    inputQuando.value = rncData.quando
+    const checkboxes = document.querySelectorAll(".eficaciaRnc")
+    const inputAvalicaoAcao = document.getElementById("tipoRncText")
+    const envidenciaDeEficacia = document.querySelector('#envidenciaDeEficacia')
+
+    checkboxes.forEach((checkBoxAvalicaoAcao)=>{
+        if(rncData.avaliacaoDeAcao != null){
+            rncData.avaliacaoDeAcao.map((acao)=>{
+                if(checkBoxAvalicaoAcao.value == acao){
+                    checkBoxAvalicaoAcao.checked = true
+                }else if(acao != 'Documental' && acao != 'Visual' && acao != 'Entrevista' &&  acao != undefined &&  acao != null){
+                    inputAvalicaoAcao.value = acao
+                }
+            })
+        }
+    })
+    const newSaveBtn = saveBtn.cloneNode(true); // Clona o botão para remover os eventos antigos
+    if(rncData.status == 'analise'){
+        newSaveBtn.textContent = 'Aceitar'
+    }
+    else{
+        newSaveBtn.textContent = 'Salvar'
+    }
     saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);  // Substitui o botão antigo
-    if(rncData.setorAtuar == "null"){
+    
+    // sistema de botão tabs
+    if(rncData.setorAtuar == null){
         andamentoBtn.disabled = true
     }else{
         andamentoBtn.disabled = false
     }
-    if(rncData.status != 'concluido'){
+    if(rncData.quem == null){
         conclusaoBtn.disabled = true
     }else{
         conclusaoBtn.disabled = false
     }
-    let funcioanriosSetorAtuar = funcionarios.filter((funcionario)=> funcionario.setor.sigla == rncData.setorAtuar)
-    selectQuem.innerHTML = `
-        <option value="null">--Selecione--</option>
-    `
+
+    let funcioanriosSetorAtuar = funcionarios.filter((funcionario)=> funcionario.departamento.sigla == rncData.setorAtuar?.sigla)
+
+    function checkChangeInBackForm (){
+        let changes = false
+            let tipoMark
+            const isTextInputFilled = inputAvalicaoAcao.value.trim() !== ""
+            tipo.forEach((currentTipo)=>{
+                if(currentTipo.checked){
+                    tipoMark = currentTipo.value
+                }
+            })
+            
+            if(atualActive == 'detalhamento'){
+                if(rncData.tipo != tipoMark){
+                    changes = true
+                }
+                
+                if(rncData.setorAtuar?._id != setorAtuar.value){
+                    changes = true
+                }
+    
+                if(rncData.nivelSeveridade != severidade.value){
+                    changes = true 
+                }
+    
+                if(rncData.status != status.value){
+                    changes =  true
+                }
+            }else if(atualActive == 'andamento'){
+                if(inputOque.value==""?null:inputOque.value != rncData.oque){
+                    changes = true
+                }
+                if(selectQuem.value ==""?null:selectQuem.value != rncData.quem?._id){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputQuando.value ==""?null:inputQuando.value != rncData.quando){
+                    changes = true
+                    console.log('aqui') 
+                }
+    
+                if(inputOnde.value==""?null:inputOnde.value != rncData.onde){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputComo.value==""?null:inputComo.value != rncData.como){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputPorque.value==""?null:inputPorque.value != rncData.porque){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputCusto.value == ""?null:inputCusto.value != rncData.custo){
+                    changes = true
+                    console.log('aqui')
+                }
+    
+                if(inputEvid.value){
+                    changes = true
+                    console.log('aqui')
+                }
+            }else if(atualActive == 'conclusao'){
+                let avaliacaoDeAcao = []
+    
+                if(isTextInputFilled)
+                   avaliacaoDeAcao.push(inputAvalicaoAcao.value.trim())
+        
+                checkboxes.forEach((checkbox)=>{
+                    if(checkbox.checked)
+                        avaliacaoDeAcao.push(checkbox.value)
+                })
+        
+                if(!arraysAreEqualUnordered(avaliacaoDeAcao,rncData.avaliacaoDeAcao)){
+                    changes = true
+                    console.log('aqui')
+                }
+                
+                let acaoDaEficacia = null
+        
+                acaoEficacia.forEach((radioAcao)=>{
+                    if(radioAcao.checked)
+                        acaoDaEficacia = radioAcao.value
+                })
+        
+                if(rncData.acaoDaEficacia != acaoDaEficacia){
+                    console.log('aqui')
+                    changes = true
+                }
+                let dataPrevista = rncData.dataPrevista == null?'':rncData.dataPrevista
+                if(dataPrevistaConclusao.value != dataPrevista){
+                    console.log('aqui')
+                    changes = true                
+                }
+        
+                // if(envidenciaDeEficacia.value){
+                //     changes = true
+                // }
+            }
+    
+            if(!changes) // se não tiver mudanças ele retorna
+                return
+    
+            alert('Lembre-se você não salvou as alterações do formulario anterior')
+    }
+
+    if(rncData.status != 'analise'){
+        detalhamentoRncBtn.addEventListener('click',checkChangeInBackForm)
+        andamentoBtn.addEventListener('click',checkChangeInBackForm)
+        conclusaoBtn.addEventListener('click',()=>{
+            newSaveBtn.innerText = "Concluir"
+            checkChangeInBackForm
+        })
+    }else{
+        detalhamentoRncBtn.removeEventListener('click',checkChangeInBackForm)
+    }
+
+
     funcioanriosSetorAtuar?.map((funcionarioSetorAtuar)=>{
         const options = document.createElement('option')
-        options.value = funcionarioSetorAtuar.email
-        options.innerText = `${funcionarioSetorAtuar.nome} - ${funcionarioSetorAtuar.setor.sigla}` 
+        options.value = funcionarioSetorAtuar._id
+        options.innerText = `${funcionarioSetorAtuar.nome} - ${funcionarioSetorAtuar.departamento.sigla}` 
         selectQuem.appendChild(options)
     })
+    selectQuem.value = rncData.quem?._id
+    newSaveBtn.addEventListener('click', async ()=>{
+        if(status.value){
+            status.set
+        } 
 
-    selectQuem.value = rncData.quem
+        let active = null
 
-    newSaveBtn.addEventListener('click',()=>{
-        rncData.status = status.value
-        rncData.severidade = severidade.value
-
-        let gestor = pegarGestorDoSetor(setorAtuar.value)
-        if(status.value != rncData.status){
-            rncData.linhaDoTempo.push({
-                criador: {nome:user.nome,setor:user.setor,avatar:user.avatar,email:user.email},
-                hora:fullHora,
-                data: fullData,
-                menssagem: `status alterado para ${status.value} por: ${user.nome}`
-            })
-        }
-        if(severidade.value != rncData.severidade){
-            rncData.linhaDoTempo.push({
-                criador: {nome:user.nome,setor:user.setor,avatar:user.avatar,email:user.email},
-                hora:fullHora,
-                data: fullData,
-                menssagem: `severidade alterada para ${severidade.value} por: ${user.nome}`
-            }) 
-        }
-        if(setorAtuar.value != rncData.setorAtuar){
-            rncData.linhaDoTempo.push({
-                criador: {nome:user.nome,setor:user.setor,avatar:user.avatar,email:user.email},
-                hora:fullHora,
-                data: fullData,
-                menssagem: `setor ${setorAtuar.value} foi anexado por: ${user.nome}`
-            }) 
-        }
-
-        rncData.pessoasAnexadas.push({nome:user.nome,avatar:user.avatar,email:user.email,setor:user.setor})
-        rncData.pessoasAnexadas = naoRepete(rncData.pessoasAnexadas)
-
-        rncData.quem = selectQuem.value
-        rncData.severidade = severidade.value
-        rncData.origem = origem.value
-
-        
-        if(rncData.setorAtuar != setorAtuar.value){ // checando se o setor mudou para não ter um span de msg
-            rncData.setorAtuar = setorAtuar.value
-            addMsg(gestor,user,rncData,fullData, fullHora,"Nova não conformidade identificada")
-        }
-        if(selectQuem.value != "null"){    
-            let funcionarioSelecionado = funcioanriosSetorAtuar.filter((funcionarioSetorAtuar)=>funcionarioSetorAtuar.email == selectQuem.value)
-            rncData.pessoasAnexadas.push({nome:funcionarioSelecionado[0].nome,avatar:funcionarioSelecionado[0].avatar,email:funcionarioSelecionado[0].eamil,setor:funcionarioSelecionado[0].setor})
-            rncData.pessoasAnexadas = naoRepete(rncData.pessoasAnexadas)
-            rncData.linhaDoTempo.push({
-                criador: {nome:user.nome,setor:user.setor,avatar:user.avatar,email:user.email},
-                hora:fullHora,
-                data: fullData,
-                menssagem: `${user.nome} anexou ${funcionarioSelecionado[0].nome}`
-            })
-            addMsg(funcionarioSelecionado[0],user,rncData,fullData,fullHora,"Você foi anexado a um não conformidade")
-        }
-        console.log(rncData)
-        modificandoRncPeloId(rncData)
-        closeModal()
-    })
-    modal.style.display = "block";
-}
-
-function modificandoRncPeloId (rnc) {
-    let funcionairos = JSON.parse(localStorage.getItem('funcionarios'))
-    let modificacao = false
-    funcionairos.map((funcioanrio)=>{
-        if(funcioanrio.email == user.email){
-            funcioanrio.mensagens.map((mensagem)=>{
-                if(mensagem.rnc.numero == rnc.numero){
-                if(mensagem.rnc.status != rnc.status){
-                    mensagem.rnc.status = rnc.status
-                    mensagem.rnc.linhaDoTempo = rnc.linhaDoTempo
-                    modificacao = true
-                }
-                if(mensagem.rnc.severidade != rnc.severidade){
-                    mensagem.rnc.severidade = rnc.severidade
-                    modificacao = true
-                }
-                if(mensagem.rnc.setorAtuar != rnc.setorAtuar){
-                    mensagem.rnc.setorAtuar = rnc.setorAtuar
-                    mensagem.rnc.pessoasAnexadas = rnc.pessoasAnexadas
-                    modificacao =  true
-                }
-                if(mensagem.rnc.quem != rnc.quem){
-                    mensagem.rnc.quem =  rnc.quem
-                    mensagem.rnc.pessoasAnexadas = rnc.pessoasAnexadas
-                    modificacao = true
-                }
-                }
-            })
-        }
-    })
-    if(modificacao){
-        let arrayRnc = JSON.parse(localStorage.getItem('rnc'))
-        arrayRnc.map((indexRnc)=>{
-            if(indexRnc.numero == rnc.numero){
-                if(indexRnc.status != rnc.status){
-                    indexRnc.status = rnc.status
-                    indexRnc.linhaDoTempo = rnc.linhaDoTempo
-                    modificacao = true
-                }
-                if(indexRnc.severidade != rnc.severidade){
-                    indexRnc.severidade = rnc.severidade
-                    modificacao = true
-                }
-                if(indexRnc.setorAtuar != rnc.setorAtuar){
-                    indexRnc.setorAtuar = rnc.setorAtuar
-                    indexRnc.pessoasAnexadas = rnc.pessoasAnexadas
-                    modificacao =  true
-                }
-                if(indexRnc.quem != rnc.quem){
-                    indexRnc.quem =  rnc.quem
-                    indexRnc.pessoasAnexadas = rnc.pessoasAnexadas
-                    modificacao = true
-                }
+        document.querySelectorAll('.tab-content').forEach((element)=>{
+            if(element.className.includes('active')){
+                active = element
             }
         })
 
-        console.log(arrayRnc)
+        let formSelect = active.getAttribute('id')
 
-        localStorage.setItem('funcionarios', JSON.stringify(funcionairos))
-        localStorage.setItem('rnc',JSON.stringify(arrayRnc))
-    }
+        const isAnyCheckboxChecked = Array.from(checkboxes).some(checkbox => checkbox.checked)
+        const isTextInputFilled = inputAvalicaoAcao.value.trim() !== ""
+        
+        if(formSelect == 'conclusao'){
+            if (!isAnyCheckboxChecked && !isTextInputFilled) {
+                checkboxes.forEach((checkbox)=> checkbox.setCustomValidity("Selecione uma das opções"))
+                inputAvalicaoAcao.setCustomValidity("Selecione uma das opções")
+            }else{
+                checkboxes.forEach((checkbox)=> checkbox.setCustomValidity(""))
+                inputAvalicaoAcao.setCustomValidity("")
+            }
+        }
+
+        if(status.value == 'analise'){
+            status.setCustomValidity("RNC não pode ser aceita com status em Análise")
+        }else{
+            status.setCustomValidity("")
+        }
+
+        if(!active.reportValidity())
+            return
+
+        let tipoMark
+
+        tipo.forEach((currentTipo)=>{
+            if(currentTipo.checked){
+                tipoMark = currentTipo.value
+            }
+        })
+
+        if(formSelect == "detalhamento" && rncData.nivelSeveridade == "null"){
+            let newRnc = {
+                idSolicitacaoRnc:rncData._id,
+                tipo:tipoMark,
+                setorAtuar:setorAtuar.value,
+                nivelSeveridade:severidade.value,
+                status:status.value,
+                user
+            }
+            
+            await hendleSetRnc(newRnc)
+            return
+
+        }
+
+        if(formSelect == "detalhamento" && rncData.nivelSeveridade != "null"){
+            let changes = []
+            
+            let changeRnc = {
+                idRnc:rncData._id,
+                user
+            } 
+
+            if(rncData.tipo != tipoMark){
+                changes.push({tipo:tipoMark})
+            }
+            
+            if(rncData.setorAtuar._id != setorAtuar.value){
+                console.log(setorAtuar.value)
+                changes.push({setorAtuar:setorAtuar.value})
+            }
+
+            if(rncData.nivelSeveridade != severidade.value){
+                changes.push({nivelSeveridade:severidade.value})
+            }
+
+            if(rncData.status != status.value){
+                changes.push({status:status.value})
+            }
+
+            if(changes.length == 0) // se não tiver mudanças ele retorna
+                return
+
+            changes.map((change)=>{
+                let key = Object.keys(change)[0]
+                
+                changeRnc[key] = change[key]
+            })
+
+            await changeDetalhamentoRnc(changeRnc)
+            return
+        }
+
+        if(formSelect == 'andamento' && rncData.quem == null || rncData.quem == "null"){
+            const body = {
+                idRnc:rncData._id,
+                user,
+                oque:inputOque.value,
+                quem:selectQuem.value,
+                quando:inputQuando.value,
+                onde:inputOnde.value,
+                como:inputComo.value,
+                porque:inputPorque.value,
+                custo:inputCusto.value,
+                evidenciasAndamentos:[]
+            }
+
+            await handleAdd5w2h(body)
+            return
+        }
+
+        if(formSelect == 'andamento' && rncData.quem != null && rncData.quem != "null"){
+            const body = {
+                idRnc:rncData._id,
+                user,
+            }
+            const mudancas = []
+
+            if(inputOque.value != rncData.oque){
+                mudancas.push({oque:inputOque.value})
+            }
+
+            if(selectQuem.value != rncData.quem._id){
+                mudancas.push({quem:selectQuem.value})
+            }
+
+            if(inputQuando.value != rncData.quando){
+                mudancas.push({quando:inputQuando.value})   
+            }
+
+            if(inputOnde.value != rncData.onde){
+                mudancas.push({onde:inputOnde.value})
+            }
+
+            if(inputComo.value != rncData.como){
+                mudancas.push({como:inputComo.value})
+            }
+
+            if(inputPorque.value != rncData.porque){
+                mudancas.push({porque:inputPorque.value})
+            }
+
+            if(inputCusto.value != rncData.custo ){
+    
+                mudancas.push({custo:inputCusto.value})
+            }
+
+            if(inputEvid.value){
+                mudancas.push({evidenciasAndamentos:['provas.png']})
+            }
+
+            if(mudancas.length == 0) // se não tiver mudanças ele retorna
+                return
+
+            // mudancas.push({linhaDoTempo:newLinhaDoTempo})
+
+            mudancas.map((change)=>{
+                let key = Object.keys(change)[0]
+                e.setAttribute(`data-${key}`,change[key])
+                body[key] = change[key]
+            })
+
+    
+            await handleEdit5w2h(body)
+            return
+        }
+
+        if(formSelect == 'conclusao'){
+            let avaliacaoDeAcao = []
+            if(isTextInputFilled)
+                avaliacaoDeAcao.push(inputAvalicaoAcao.value.trim())
+
+            checkboxes.forEach((checkbox)=>{
+                if(checkbox.checked)
+                    avaliacaoDeAcao.push(checkbox.value)
+            })
+            
+            let acaoDaEficacia
+
+            acaoEficacia.forEach((radioAcao)=>{
+                if(radioAcao.checked)
+                    acaoDaEficacia = radioAcao.value
+            })
+
+            const body = {
+                idRnc:rncData._id,
+                user,
+                avaliacaoDeAcao,
+                acaoDaEficacia,
+                arquivosComprovarEficiencia:['documento'],
+                dataPrevista:dataPrevistaConclusao.value
+            }
+
+            await handleConclusao(body)
+            return
+        }
+    })
+    modal.style.display = "flex";
 }
 
 function addMsg (usuario,emissor,rnc,data,hora,menssagem) {
@@ -452,22 +869,40 @@ const abas = [abaDetalhamento, abaAndamento, abaConclusao];
 
 function resetAbas() {
     abas.forEach(aba => aba.style.display = 'none');
+    abas.forEach(aba => aba.classList.remove('active'));
     listaDetalhesBtn.forEach(btn => btn.classList.remove('active'));
 }
 
 function inicializarAba() {
     resetAbas();
     abaDetalhamento.style.display = 'flex';
+    abaDetalhamento.classList.add('active');
     detalhamentoRncBtn.classList.add('active');
 }
 
 for (let z = 0; z < listaDetalhesBtn.length; z++) {
     listaDetalhesBtn[z].addEventListener('click', (e) => {
         e.preventDefault();
+        document.querySelectorAll('.tab-content').forEach((content)=>{
+            if(content.className.includes('active'))
+                atualActive = content.getAttribute('id')
+        })
         resetAbas();
         abas[z].style.display = 'flex';
+        abas[z].classList.add('active');
         listaDetalhesBtn[z].classList.add('active');
+        
+
     });
+}
+
+function arraysAreEqualUnordered(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false
+  
+    const sortedArr1 = [...arr1].sort()
+    const sortedArr2 = [...arr2].sort()
+  
+    return sortedArr1.every((value, index) => value === sortedArr2[index])
 }
 
 inicializarAba();

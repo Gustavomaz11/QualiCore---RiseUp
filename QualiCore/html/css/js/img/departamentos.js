@@ -37,6 +37,24 @@ let lengthRnc = localStorage.getItem('lengthRnc')
 if(lengthRnc != null)
     lengthRnc = JSON.parse(lengthRnc)
 
+function showName (nomeCompleto){
+    while (nomeCompleto.length > 13) {
+        const partes = nomeCompleto.trim().split(" ")
+        if (partes.length > 1) {
+            partes.pop()
+            nomeCompleto = partes.join(" ")
+            if(partes[partes.length-1].length <= 2){
+                partes.pop()
+                nomeCompleto = partes.join(" ")
+            }
+        } else {
+          nomeCompleto = nomeCompleto.substring(0, 13)
+          break
+        }
+      }
+      return nomeCompleto
+}
+
 // pegando usuario
 let user = localStorage.getItem('login')
 if(user != null)
@@ -46,7 +64,7 @@ if(user == null)
     window.location.href = 'index.html';
 
 const nome = document.querySelector('#nome')
-nome.innerText = user.nome?user.nome:'xxxx'
+nome.innerText = user.nome?showName(user.nome):'xxxx'
 
 // pegando funcionarios
 let funcionarios = localStorage.getItem('funcionarios')
@@ -168,8 +186,8 @@ function renderDepartments(filteredDepartments = departments) {
     filteredDepartments.forEach(dept => {
         const card = document.createElement('div');
         card.className = 'department-card';
-        const statusClass = dept.status === 'active' ? 'status-active' : 'status-blocked';
-        const statusText = dept.status === 'active' ? 'Ativo' : 'Bloqueado';
+        const statusClass = dept.ativo ? 'status-active' : 'status-blocked';
+        const statusText = dept.ativo  ? 'Ativo' : 'Bloqueado';
 
         card.innerHTML = `
             <div class="department-header">

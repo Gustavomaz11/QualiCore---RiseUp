@@ -2,15 +2,15 @@
 @import url('mainPage.css');
 @import url('abrirRnc.css');
 @import url('kanban.css');
+@import url('monitoramento.css');
 
 .navPrincipa {
     background: linear-gradient(to right, var(--cor-principal), var(--cor-principal), #000);
     color: white;
     padding: 1rem 2rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-top: 7rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -23,9 +23,10 @@
 }
 
 .container {
-    max-width: 1600px;
-    margin-left: 1.5rem;
-    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
 }
 
 .inbox-header {
@@ -38,11 +39,14 @@
 
 .inbox-title {
     font-size: clamp(1.3rem,3vw,1.5rem);
-    color: #2c3e50;
+    color: white;
 }
 
 .filter-box {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
     gap: 1rem;
 }
 
@@ -65,11 +69,16 @@
 .notifications-list {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 1rem;
     gap: 1rem;
 }
 
 .notification-card {
     background-color: white;
+    width: 80%;
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);

@@ -74,6 +74,24 @@ const inputEvid = document.querySelector('#evid')
 // pegando a rnc pelo localstorege
 let funcionarios
 
+function showName (nomeCompleto){
+    while (nomeCompleto.length > 13) {
+        const partes = nomeCompleto.trim().split(" ")
+        if (partes.length > 1) {
+            partes.pop()
+            nomeCompleto = partes.join(" ")
+            if(partes[partes.length-1].length <= 2){
+                partes.pop()
+                nomeCompleto = partes.join(" ")
+            }
+        } else {
+          nomeCompleto = nomeCompleto.substring(0, 13)
+          break
+        }
+      }
+      return nomeCompleto
+}
+
 // pegando usuario
 let user = localStorage.getItem('login')
 if(user != null)
@@ -85,7 +103,7 @@ if(user == null)
     window.location.href = 'index.html';
 
 const nome = document.querySelector('#nome')
-nome.innerText = user.nome?user.nome:'xxxx'
+nome.innerText = user.nome?showName(user.nome):'xxxx'
 
 // limpando o cash
 const btnlimparCash = document.querySelector('#limparCash')
@@ -139,7 +157,7 @@ async function handleGetMyCarLetter (){
     } catch (error) {
         console.log(error)
     } finally {
-        setInterval(handleGetMyCarLetter,5000)
+        setInterval(handleGetMyCarLetter,30000)
     }
 }
 
@@ -185,7 +203,6 @@ async function handleChangeStatus (body){
         })
 
         if(respostaJson.status == 204){
-            alert('status mudado com sucesso')
             return
         }
 
@@ -408,35 +425,6 @@ document.addEventListener('DOMContentLoaded',async function () {
     rnc.push(...rncSolicitadas)
     rnc.push(...rncAceitas)
     rnc.push(...rncConcluidas)
-
-
-    function pegarGestorDoSetor (siglaSetor){
-        const gestor = funcionarios.filter((indexUser)=>{
-            if(indexUser.setor.sigla == siglaSetor && indexUser.cargo == "Gerente Setor")
-                return indexUser
-        })
-
-        return gestor?gestor[0]:gestor
-    }
-
-    function addMsg (usuario,emissor,rnc,data,hora,menssagem) {
-        usuario.mensagens.push({
-            emissor:{nome:emissor.nome, avatar:emissor.avatar},
-            lida:false,
-            menssagem,
-            data,
-            hora,
-            rnc
-        })
-
-        funcionarios.map((funcionario)=>{
-            if(funcionario.email === usuario.email){
-                funcionario = usuario
-            }
-        })
-
-        localStorage.setItem('funcionarios', JSON.stringify(funcionarios))
-    }
     
     // Add event listeners to cards and columns
     cards.forEach(card => {
@@ -476,19 +464,6 @@ document.addEventListener('DOMContentLoaded',async function () {
             }
         })
     })
-    
-    function addRncAtualizado (){
-        rnc = JSON.parse(localStorage.getItem('rnc'))
-        console.log('a')
-        lengthRnc = JSON.parse(localStorage.getItem('lengthRnc'))
-        if(rnc?.length > lengthRnc){
-            atualizandoRnc()
-            // showPopup()
-            localStorage.setItem('lengthRnc', lengthRnc + 1)
-        }
-    }
-
-    // setInterval(addRncAtualizado, 5000)
 
     function createNewCard() {
         const card = document.createElement('div');
@@ -608,8 +583,10 @@ function handleTouchMoveEnd (evt) {
     const touch = evt.changedTouches[0]
     const targetColumn = document.elementFromPoint(touch.clientX , touch.clientY)
     const rncStatus = draggedCard.getAttribute('data-status')
+    console.log(targetColumn.getAttribute('data-column'))
+    console.log(rncStatus)
     if (targetColumn && targetColumn.classList.contains('kanban-cards')) {
-        if(rncStatus != 'analise' && rncStatus != 'concluido'){
+        if(rncStatus != 'analise' && rncStatus != 'concluido' && targetColumn.getAttribute('data-column') != 'analise'){
             let idRnc = draggedCard.getAttribute('data-_id')
             const body = {
                 idRnc,
@@ -622,10 +599,13 @@ function handleTouchMoveEnd (evt) {
             modificandoRncPeloId(draggedCard)
             updateColumnCounts()
             atualizandoRnc()
+            alert(`Status alterado para ${targetColumn.getAttribute('data-column')}`)
         }else if(targetColumn.getAttribute('data-column') == "concluido"){
             alert('Para concluir a RNC é necessario abrir o modal e preencher o formulario')
         }else if(rncStatus == 'concluido'){
             alert('Par modificar o status da RNC é necessario que ela não esteja como concluida')
+        }else if(targetColumn.getAttribute('data-column') == "analise" && rncStatus != 'analise'){
+            alert('RNC não pode ter status em análise depois que ela é aceita')
         }
         else{
             alert('Para modificar o status da RNC é necessario aceitar a solicitação')
@@ -890,7 +870,7 @@ function openModalOnDoubleClick(e) {
                 if(rncData.nivelSeveridade != severidade.value){
                     changes = true 
                 }
-    
+                
                 if(rncData.status != status.value){
                     changes =  true
                 }
@@ -1021,8 +1001,14 @@ function openModalOnDoubleClick(e) {
             }
         }
 
-        if(status.value == 'analise'){
+        if(status.value == 'analise' && rncData.status == 'analise'){
             status.setCustomValidity("RNC não pode ser aceita com status em Análise")
+        }else{
+            status.setCustomValidity("")
+        }
+
+        if(status.value == 'analise' && rncData.status != 'analise'){
+            status.setCustomValidity("RNC não pode ter status alterado para em Análise")
         }else{
             status.setCustomValidity("")
         }
@@ -1197,64 +1183,6 @@ function openModalOnDoubleClick(e) {
 
 
         return
-
-        if(status.value != rncData.status){
-            rncData.status = status.value
-            rncData.linhaDoTempo.push({
-                criador: {nome:user.nome,setor:user.setor,avatar:user.avatar,email:user.email},
-                hora:fullHora,
-                data: fullData,
-                menssagem: `status alterado para ${status.value} por: ${user.nome}`
-            })
-        }
-        if(severidade.value != rncData.severidade){
-            rncData.linhaDoTempo.push({
-                criador: {nome:user.nome,setor:user.setor,avatar:user.avatar,email:user.email},
-                hora:fullHora,
-                data: fullData,
-                menssagem: `severidade alterada para ${severidade.value} por: ${user.nome}`
-            }) 
-        }
-        if(setorAtuar.value != rncData.setorAtuar){
-            rncData.linhaDoTempo.push({
-                criador: {nome:user.nome,setor:user.setor,avatar:user.avatar,email:user.email},
-                hora:fullHora,
-                data: fullData,
-                menssagem: `setor ${setorAtuar.value} foi anexado por: ${user.nome}`
-            }) 
-        }
-        rncData.pessoasAnexadas.push({nome:user.nome,avatar:user.avatar,email:user.email,setor:user.setor})
-        rncData.pessoasAnexadas = naoRepete(rncData.pessoasAnexadas)
-
-        rncData.severidade = severidade.value
-        rncData.origem = origem.value
-        rncData.tipo = tipo.value
-
-        if(rncData.setorAtuar != setorAtuar.value){ // checando se o setor mudou para não ter um span de msg
-            rncData.setorAtuar = setorAtuar.value
-            addMsg(gestor,user,rncData,fullData, fullHora,"Nova não conformidade identificada")
-        }
-
-        if(selectQuem.value != "null"){    
-            let funcionarioSelecionado = funcioanriosSetorAtuar.filter((funcionarioSetorAtuar)=>funcionarioSetorAtuar.email == selectQuem.value)
-            rncData.pessoasAnexadas.push({avatar:funcionarioSelecionado[0].avatar,nome:funcionarioSelecionado[0].nome,setor:funcionarioSelecionado[0].setor,email:funcionarioSelecionado[0].email})
-            rncData.pessoasAnexadas = naoRepete(rncData.pessoasAnexadas)
-            e.setAttribute('data-pessoasAnexadas', JSON.stringify(rncData.pessoasAnexadas))
-            e.setAttribute('data-quem', selectQuem.value)
-            rncData.linhaDoTempo.push({
-                criador: {nome:user.nome,setor:user.setor,avatar:user.avatar,email:user.email},
-                hora:fullHora,
-                data: fullData,
-                menssagem: `${user.nome} anexou ${funcionarioSelecionado[0].nome}`
-            })
-            addMsg(funcionarioSelecionado[0],user,rncData,fullData,fullHora,"Você foi anexado a um não conformidade")
-        }
-        e.setAttribute('data-linhaDoTempo', JSON.stringify(rncData.linhaDoTempo))
-        e.setAttribute('data-pessoasAnexadas', JSON.stringify(rncData.pessoasAnexadas))
-        modificandoRncPeloId(e)
-        atualizandoRnc()
-       
-        closeModal()
     })
     modal.style.display = "flex";
 }
@@ -1307,68 +1235,6 @@ function modificandoRncPeloId (divRnc) {
         if(indexRnc._id == divRnc.getAttribute('data-_id')){
             if(indexRnc.status != divRnc.getAttribute('data-status')){
                 indexRnc.status = divRnc.getAttribute('data-status')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao = true
-            }
-            if(indexRnc.nivelSeveridade != divRnc.getAttribute('data-nivelSeveridade')){
-                indexRnc.nivelSeveridade = divRnc.getAttribute('data-nivelSeveridade')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao = true
-            }
-            if(indexRnc.setorAtuar != divRnc.getAttribute('data-setorAtuar')){
-                indexRnc.setorAtuar = divRnc.getAttribute('data-setorAtuar')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao =  true
-            }
-            if(indexRnc.tipo != divRnc.getAttribute('data-tipo')){
-                indexRnc.status = divRnc.getAttribute('data-status')
-                indexRnc.linhaDoTempo = divRnc.getAttribute('data-linhaDoTempo')
-                modificacao = true
-            }
-            if(modificacao) // se ele mudou alguma coisa no primeiro form não tem como ele editar outra ao mesmo tempo
-                return 
-
-            if(indexRnc.oque != divRnc.getAttribute('data-oque')){
-                indexRnc.oque =  divRnc.getAttribute('data-oque')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao = true
-            }
-            if(indexRnc.quem != divRnc.getAttribute('data-quem')){
-                indexRnc.quem =  divRnc.getAttribute('data-quem')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao = true
-            }
-            if(indexRnc.quando != divRnc.getAttribute('data-quando')){
-                indexRnc.quando =  divRnc.getAttribute('data-quando')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao = true
-            }
-            if(indexRnc.onde != divRnc.getAttribute('data-onde')){
-                indexRnc.onde =  divRnc.getAttribute('data-onde')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao = true
-            }
-            if(indexRnc.como != divRnc.getAttribute('data-como')){
-                indexRnc.como =  divRnc.getAttribute('data-como')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao = true
-            }
-            if(indexRnc.porque != divRnc.getAttribute('data-porque')){
-                indexRnc.porque =  divRnc.getAttribute('data-porque')
-                indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
-                indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
-                modificacao = true
-            }
-            if(indexRnc.custo != divRnc.getAttribute('data-custo')){
-                indexRnc.custo =  divRnc.getAttribute('data-custo')
                 indexRnc.linhaDoTempo = JSON.parse(divRnc.getAttribute('data-linhaDoTempo'))
                 indexRnc.pessoasAnexadas = JSON.parse(divRnc.getAttribute('data-pessoasAnexadas'))
                 modificacao = true
