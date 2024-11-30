@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QualiCore - RNC</title>
+    <link rel="stylesheet" href="css/abrirRnc.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="shortcut icon" href="css/js/img/faviconQualicore.svg" type="image/x-icon">
+    <script src="css/js/img/abrirRnc.js" defer></script>
+    <script src="css/js/img/mainPage.js" defer></script>
+</head>
+<body>
+    <aside>
+        <button type="button" id="btnCloneMenu"><i class="bi bi-x"></i></button>
+        <div class="divisaoSideBar">
+            <div class="conteudoSideBar">
+                <img src="css/js/img/qualicore.svg" alt="qualiCoreLogo" width="290rem" height="auto">
+            </div>
+            <div class="conteudoSideBar">
+                <button type="button" id="dashBtn"><i class="bi bi-house-door"></i>Dashboard</button>
+                <button type="button" id="relatorioBtn"><i class="bi bi-clipboard2-data-fill"></i>Relatório de
+                    Qualidade</button>
+                <button type="button" id="rncBtn"><i class="bi bi-exclamation-triangle"></i>RNC</button>
+                <button type="button" id="dashDetalhadoBtn"><i class="bi bi-graph-up"></i>Gráficos Detalhados</button>
+                <button type="button" id="monitoramentoBtn"><i class="bi bi-clock"></i>Monitoramento</button>
+                <button type="button" id="departamentoBtn"><i class="bi bi-grid"></i>Departamentos</button>
+                <button type="button" id="usuariosBtn"><i class="bi bi-people"></i>Usuários</button>
+            </div>
+        </div>
+        <div class="divisaoSideBar">
+            <div class="conteudoSideBar">
+                <h5>QualiCore - Governo do Estado de Sergipe</h5>
+                <h6>2024 Fundação de Saúde Parreiras Horta</h6>
+            </div>
+            <div class="conteudoSideBar">
+                <h5>FSPH - Sergipe</h5>
+            </div>
+        </div>
+    </aside>
+    <main>
+        <section class="secaoPrincipal">
+            <div class="containerBusca">
+                <input type="text" id="busca" class="campoBusca" placeholder="Procurar">
+                <i class="bi bi-search iconeBusca"></i>
+            </div>
+            <div class="containerBtnAndInfo">
+                <div class="botoesAcao">
+                    <button type="button" id="btnMenu" class="botaoIcone"><i class="bi bi-list"></i></button>
+                    <button type="button" class="botaoIcone" id="cxEntradaBtn"><i class="bi bi-envelope"></i></button>
+                </div>
+                <hr/>
+                <div class="infoUsuario">
+                    <span>Olá, <span id="nome">Gustavo</span></span>
+                    <div class="avatarUsuario" id="botaoPerfil">
+                        <i id="iconPesoa" class="bi bi-person"></i>
+                        <img class="imgPerfil" src="" alt="">
+                    </div>
+                    <div class="dropdownPerfil" id="menuPerfil">
+                        <a class="itemDropdown" id="meuPerfilBtn">
+                            <i class="bi bi-person-circle"></i>
+                            Meu Perfil
+                        </a>
+                        <div class="separadorDropdown"></div>
+                        <a href="index.html" class="itemDropdown">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+    </section>
+        <nav class="navPrincipal navMain">
+            <div class="aberturaRnc">
+                <fieldset>
+                    <legend>REGISTRO DE NÃO CONFORMIDADE</legend>
+    
+                        <div class="progressoBarra">
+                            <div class="etapa">
+                                <div class="bolinha active"></div>
+                                <spam class="nomeEtapa">Origem, Descrição e Enquadramento</spam>
+                            </div>
+                            <div class="etapa">
+                                <div class="bolinha"></div>
+                                <spam class="nomeEtapa">Evidências </spam>
+                            </div>
+                        </div>
+    
+                        <form class="passos">
+                            <h2 class="tituloPassos">Origem, Descrição e Enquadramento</h2>
+    
+                            <div class="aberturaRncGrupo">
+                                <label for="divRadios">Origem</label>
+                                <div class="divRadios">
+                                    <label>
+                                        <input required type="radio" name="origem" value="Processos / Insumos" id="origem">
+                                        Processos / Insumos
+                                    </label>
+                                    <label>
+                                        <input required type="radio" name="origem" value="Auditoria Interna" id="origem">
+                                        Auditoria Interna
+                                    </label>
+                                    <label>
+                                        <input required type="radio" name="origem"  value="Auditoria Externa" id="origem">
+                                        Auditoria Externa
+                                    </label>
+                                    <label>
+                                        <input required type="radio" name="origem" value="Análise Crítica do Sistema" id="origem">
+                                        Análise Crítica do Sistema
+                                    </label>
+                                    <label>
+                                        <input required type="radio" name="origem" value="Reclamação de Cliente" id="origem">
+                                        Reclamação de Cliente
+                                    </label>
+                                    <label>
+                                        <input required type="radio" name="origem" value="Produto não Conforme" id="origem">
+                                        Produto não Conforme
+                                    </label>
+                                    <label>
+                                        <input required type="radio" name="origem" value="Acidente / Incidente" id="origem">
+                                        Acidente / Incidente
+                                    </label>
+                                    <label>
+                                        <input required type="radio" name="origem" value="Oportunidade de Melhoria" id="origem">
+                                        Oportunidade de Melhoria
+                                    </label>
+                                </div>
+                            </div>
+        
+        
+                            <div class="aberturaRncGrupo">
+                                <label for="descrever">Descreva a não conformidade (Detalhar a ocorrência)</label>
+                                <textarea required name="descrever" id="descrever"></textarea>
+                            </div>
+        
+                            <div class="aberturaRncGrupo">
+                                <label for="enquadramento">Enquadramento (Documento de referência)</label>
+                                <div class="custom-select">
+                                    <input type="text" required id="search" class="campoBuscaRNC" placeholder="Procurar..." onkeyup="filterOptions()">
+                                    <div id="selectedOptions" class="selected-container"></div>
+                                    <div id="dropdown" class="options-container">
+                                        <label><input type="checkbox" value="ABNT NBR ISO 15189:2015. Laboratórios Clínicos" onchange="updateSelected(this)"> ABNT NBR ISO 15189:2015. Laboratórios Clínicos - Requisitos de qualidade e competência.</label>
+                                        <label><input type="checkbox" value="ABNT NBR ISO 9001:2015. Sistemas de gestão de qualidade" onchange="updateSelected(this)"> ABNT NBR ISO 9001:2015. Sistemas de gestão de qualidade - Requisitos.</label>
+                                        <label><input type="checkbox" value="ABNT NBR ISO/IEC 17025:2017" onchange="updateSelected(this)"> ABNT NBR ISO/IEC 17025:2017. Requisitos gerais para a capacitação de laboratórios de calibração e ensaio.</label>
+                                        <label><input type="checkbox" value="PORTARIA DE CONSOLIDAÇÃO Nº 5 de 28 de setembro de 2017" onchange="updateSelected(this)"> PORTARIA DE CONSOLIDAÇÃO Nº 5 de 28 de setembro de 2017. Anexo IV - Do Sangue, Componentes e Derivados.</label>
+                                        <label><input type="checkbox" value="RDC Nº 34:2014" onchange="updateSelected(this)"> RDC Nº 34:2014. Dispõe sobre as Boas Práticas no Ciclo do Sangue.</label>
+                                        <label><input type="checkbox" value="RDC Nº 399:2020" onchange="updateSelected(this)"> RDC Nº 399:2020. Revoga a alínea "d" do inciso XXX do art. 25 da Resolução de Diretoria Colegiada.</label>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="aberturaRncGrupo">
+                                <label for="acaoImediata">Ação Imediata (Ação de contenção)</label>
+                                <textarea required name="acaoImediata" id="acaoImediata"></textarea>
+                            </div>
+                            <div class="aberturaRncGrupo">
+                                <label for="investigacao">Investigação e Identificação de Causas</label>
+                                <textarea required name="investigacao" id="investigacao"></textarea>
+                            </div>
+        
+                            <div class="aberturaRncGrupo"></div>
+                                <label for="setorAutuado">Área onde Ocorreu a Não Conformidade e Responsável</label>
+                                <select name="setorAutuado" id="setorAutuado" class="selecionarElementos" disabled>
+                                    <!-- <option value="Enfermaria">Enfermaria - Responsável Enfª Lara</option>
+                                    <option value="Consultório">Consultório - Responsável Matheus</option>
+                                    <option value="Laboratório">Laboratorio - Responsável Messi</option>
+                                    <option value="Recepção">Recepção - Responsável Neymar</option>
+                                    <option value="Tecnologia da Informação">TI - Responsável Gustavo</option>
+                                    <option value="Recursos Humanos">RH - Responsável Jorge</option>
+                                    <option value="Ambulatório">AMB - Adson</option> -->
+                                </select>
+
+                                <button type="submit" id="btnProximo" class="submitBtn">Proximo</button>
+                            </form>
+    
+                    </div>
+
+                </div>  
+
+                <form class="passos" style="display: none;">
+
+                <div class="aberturaRncGrupo">
+                    <h2>Evidências</h2>
+                    <label for="anexo" class="submitBtnRNC">Anexar a evidência da não conformidade
+                        <input type="file" name="anexo" id="anexo" class="inputPadrao" multiple>
+                    </label>
+                </div>
+                
+                <table id="anexoTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Arquivo</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Tabela Dinâmica para Anexos -->
+                    </tbody>
+                </table>
+                <button id="btnSubmit" style="display: none;" type="submit" class="submitBtn">Solicitar Autuação</button>
+                <button id="btnVoltar" style="display: none;" type="button" class="submitBtn">Voltar</button>    
+            </form>
+                
+                </fieldset>
+            </div>
+    
+            
+        </nav>
+    </main>
+</body>
+</html>

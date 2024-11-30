@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QualiCore - Usuários</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="shortcut icon" href="css/js/img/faviconQualicore.svg" type="image/x-icon">
+    <link rel="stylesheet" href="css/usuarios.css">
+    <script src="css/js/img/usuarios.js" defer></script>
+</head>
+<body>
+    <aside>
+        <button type="button" id="btnCloneMenu"><i class="bi bi-x"></i></button>
+        <div class="divisaoSideBar">
+            <div class="conteudoSideBar">
+                <img src="css/js/img/qualicore.svg" alt="qualiCoreLogo" width="290rem" height="auto">
+            </div>
+            <div class="conteudoSideBar">
+                <button type="button" id="dashBtn"><i class="bi bi-house-door"></i>Dashboard</button>
+                <button type="button" id="relatorioBtn"><i class="bi bi-clipboard2-data-fill"></i>Relatório de
+                    Qualidade</button>
+                <button type="button" id="rncBtn"><i class="bi bi-exclamation-triangle"></i>RNC</button>
+                <button type="button" id="dashDetalhadoBtn"><i class="bi bi-graph-up"></i>Gráficos Detalhados</button>
+                <button type="button" id="monitoramentoBtn"><i class="bi bi-clock"></i>Monitoramento</button>
+                <button type="button" id="departamentoBtn"><i class="bi bi-grid"></i>Departamentos</button>
+                <button type="button" id="usuariosBtn"><i class="bi bi-people"></i>Usuários</button>
+            </div>
+        </div>
+        <div class="divisaoSideBar">
+            <div class="conteudoSideBar">
+                <h5>QualiCore - Governo do Estado de Sergipe</h5>
+                <h6>2024 Fundação de Saúde Parreiras Horta</h6>
+            </div>
+            <div class="conteudoSideBar">
+                <h5>FSPH - Sergipe</h5>
+            </div>
+        </div>
+    </aside>
+    <main>
+        <section class="secaoPrincipal">
+            <div class="containerBusca">
+                <input type="text" id="busca" class="campoBusca" placeholder="Procurar">
+                <i class="bi bi-search iconeBusca"></i>
+            </div>
+            <div class="containerBtnAndInfo">
+                <div class="botoesAcao">
+                    <button type="button" id="btnMenu" class="botaoIcone"><i class="bi bi-list"></i></button>
+                    <button type="button" class="botaoIcone" id="cxEntradaBtn"><i class="bi bi-envelope"></i></button>
+                </div>
+                <hr/>
+                <div class="infoUsuario">
+                    <span>Olá, <span id="nome">Gustavo</span></span>
+                    <div class="avatarUsuario" id="botaoPerfil">
+                        <i id="iconPesoa" class="bi bi-person"></i>
+                        <img class="imgPerfil" src="" alt="">
+                    </div>
+                    <div class="dropdownPerfil" id="menuPerfil">
+                        <a class="itemDropdown" id="meuPerfilBtn">
+                            <i class="bi bi-person-circle"></i>
+                            Meu Perfil
+                        </a>
+                        <div class="separadorDropdown"></div>
+                        <a href="index.html" class="itemDropdown">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+    </section>
+        <nav class="navPrincipal">
+            <div class="logo">Perfis</div>
+            <div class="filtro">
+                <select id="filtroPerfil" onchange="filtroDoPerfil()">
+                  <option value="all">Todos</option>
+                  <option value="true">Ativos</option>
+                  <option value="false">Inativos</option>
+                  <option value="Solicitacoes">Solicitações</option>
+                </select>
+              </div>
+            <button class="add-btn" onclick="openModal()">
+                <i class="fas fa-user-plus"></i> Novo Perfil
+            </button>
+        </nav>
+    
+        <div class="container">
+            <div class="profiles-grid" id="profilesGrid"></div>
+        </div>
+    
+        <div class="modal" id="addProfileModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Adicionar Perfil</h2>
+                    <button class="close-modal" onclick="closeModal()">&times;</button>
+                </div>
+                <form id="addProfileForm">
+                    <div class="form-group">
+                        <label for="userName">Nome do Usuário</label>
+                        <input type="text" id="userName" name="NomeUsuario" placeholder="Digite seu nome completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userDepartment">Departamento</label>
+                        <select id="userDepartment" name="Departamento" required onchange="updateManager()">
+                            <option value="">Selecione um setor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="userManager">Gerente</label>
+                        <input type="text" id="userManager" name="Gestor" placeholder="Gestor" required disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" id="email" name="Email" placeholder="@fsph.com.br" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cargo">Cargo</label>
+                        <input type="text" name="Cargo" id="cargo" placeholder="Digite seu Cargo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Permicao">Permissão</label>
+                        <select required name="permissao" id="selectPermissao">
+                            <option value="">--Selecione--</option>
+                            <option value="Adm">Adm</option>
+                            <option value="Controlador">Controlador</option>
+                            <option value="Gerente">Gerente</option>
+                            <option value="User">Usuario</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="Senha" placeholder="Digite sua senha" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmacaoSenha">Confirme sua senha</label>
+                        <input type="password" id="confirmacaoSenha" name="ConfirmacaoSenha" placeholder="Confirme sua senha" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Adicionar</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="modalAceitar" class="modal">
+            <div class="modalAceitarUsuario">
+                <form id="formAceitar">
+                    <div class="modal-header">
+                        <h2>Adicionar Perfil</h2>
+                        <button id="btnFecharModalAceitar" class="close-modal">&times;</button>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Departamento
+                            <select required name="departamento" id="selectDepartamentoAceitar">
+                                <option value="">--Selecione--</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Gerente
+                            <input required type="text" name="" id="inputGerente" readonly>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Cargo
+                            <input required type="text" name="" id="inputCargo">
+                        </label>    
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Permissão
+                            <select required name="" id="selectPermissaoAceitar">
+                                <option value="">--Selecione--</option>
+                                <option value="Adm">Adm</option>
+                                <option value="Controlador">Controlador</option>
+                                <option value="Gerente">Gerente</option>
+                                <option value="User">Usuario</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btnAceitar" type="submit">Aceitar</button>
+                        <button class="btnNegar" type="reset">Limpar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

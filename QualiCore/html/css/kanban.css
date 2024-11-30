@@ -1,0 +1,590 @@
+.kanban-board {
+    display: flex;
+    gap: 20px;
+    padding: 0px 20px; 
+    font-family: "Roboto", sans-serif;
+    width: 100%;
+    min-height: 100px;
+
+    @media (max-width:1080px) {
+        align-items: center;
+        flex-direction: column;
+        padding: 10px 0px;
+    }
+}
+
+.cursorNormal {
+    cursor: auto;
+}
+
+.kanban-column {
+    flex: 1;
+    width: calc(20% - 80px);
+    padding: 15px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    cursor: auto;
+
+    @media (max-width:1080px) {
+        min-width: 95% !important;
+        min-height: 280px !important;
+        padding: 8px;
+    }
+}
+
+.scroll{
+    min-height: 100px;
+    @media (max-width:1080px) {
+        width: 90%;
+        overflow-y: hidden;
+        overflow-x: auto;
+    }
+}
+
+.kanban-cards {
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+    transition: background-color 0.2s ease;
+
+    @media (max-width:1080px) {
+        flex-direction: row;
+        justify-content: baseline;
+        align-items: stretch;
+        gap: 10px;
+        min-height: 200px;
+    }
+}
+
+.kanban-cards.drag-over {
+    background-color: #e0e0e0;
+}
+
+.column-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.column-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: clamp(12px,1.5vw,16px);
+    font-weight: 500;
+    margin-right: auto;
+}
+
+.column-count {
+    background-color: #e0e0e0;
+    border-radius: 15px;
+    padding: 2px 8px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.add-card-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #777;
+    cursor: pointer;
+}
+
+.kanban-card {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    background: white;
+    border-radius: 5px;
+    min-width: 70%;
+    padding: 15px;
+    margin: 15px 0px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: move;
+    user-select: none;
+    transition: opacity 0.2s ease;
+
+    @media (max-width:1080px) {
+        min-width: 200px;
+    }
+}
+
+.kanban-card.dragging {
+    opacity: 0.5;
+}
+
+.card-priority {
+    display: flex;
+    width: 1.5vw;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 1rem;
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: #7158e2;
+    background-color: #cbc3f1;
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.card-description {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.assignees {
+    display: flex;
+}
+
+.assignee {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #ddd;
+    margin-right: -8px;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #666;
+}
+
+.metrics {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: #777;
+    gap: 10px;
+}
+
+
+/* Tudo que envolver o modal esta aqui abaixo */
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.modal-footer {
+    text-align: right;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.modalBody {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 2% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 100%;
+    height: 100%;
+    max-height: 850px;
+    max-width: 1750px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Timeline styles */
+.linhaDoTempo {
+    position: relative;
+    max-width: 75rem;
+    margin: 0 auto 30px;
+    padding: 20px 0;
+
+}
+
+.linhaDoTempo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: #ccc;
+    transform: translateX(-50%);
+}
+
+.itemLinhaDoTempo {
+    padding: 10px 0;
+    opacity: 1;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.itemLinhaDoTempo.visivel {
+    opacity: 1;
+    transform: translateY(0);
+
+}
+
+.conteudoLinhaDoTempo {
+    position: relative;
+    padding: 15px;
+    background: #fff;
+    border-radius: 5px;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.itemLinhaDoTempo:nth-child(odd) .conteudoLinhaDoTempo {
+    left: 150px;
+
+
+}
+
+.itemLinhaDoTempo:nth-child(even) .conteudoLinhaDoTempo {
+    right: 150px;
+
+}
+
+.conteudoLinhaDoTempo::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border: 2px solid var(--cor-principal);
+    border-radius: 50%;
+    background-color: #2980b9;
+}
+
+.itemLinhaDoTempo:nth-child(odd) .conteudoLinhaDoTempo::before {
+    left: -40px;
+}
+
+.itemLinhaDoTempo:nth-child(even) .conteudoLinhaDoTempo::before {
+    right: -40px;
+}
+
+.conteudoLinhaDoTempo p {
+    margin: 0;
+    font-size: 14px;
+}
+
+#quartoGrupo {
+    display: flex;
+    flex-direction: column;
+}
+
+#quartoGrupo label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    border: 1px dotted #333;
+    padding: 10px;
+    width: 15vw;
+    height: min-content;
+    transition: 0.3s;
+}
+
+#quartoGrupo label:hover {
+    background-color: var(--cor-principal);
+    border: 1px solid #000;
+    color: #fff;
+    font-weight: bold;
+}
+
+
+/* Form styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 12px;
+    font-family: var(--fonte-principal);
+    color: var(--cor-principal);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+
+}
+
+.form-groupRadio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 5vh;
+    margin-right: 1rem;
+    font-size: 14px;
+
+}
+
+.form-groupRadioConclusao {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+.form-groupRadioConclusao label {
+    color: var(--cor-principal);
+}
+
+.form-groupRadioConclusao #tipoRncText {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-groupRadio label {
+    font-family: var(--fonte-principal);
+    color: var(--cor-principal);
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-right: 1rem;
+    flex-wrap: wrap;
+    width: 45vw;
+
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-right: 2.5rem;
+}
+
+.form-row .form-group:last-child {
+    margin-right: 0;
+}
+
+/* Button styles */
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.detalhamentoFormularioRnc {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.checkGrupo {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.checkTiposdeVerificacaoeRnc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+
+}
+
+#grupoDetalhamentoRnc {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+
+}
+
+
+
+hr {
+    margin-left: 2.5rem;
+    margin-right: 2.5rem;
+}
+
+h3 {
+    font-size: 1rem;
+    color: #444;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    background-color: #f8f9fa;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    transition: 0.3s;
+    font-size: 16px;
+    border-radius: 5px 5px 0 0;
+}
+
+.tab-button:hover {
+    background-color: #ddd;
+}
+
+.tab-button.active {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom: none;
+}
+
+.tab-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.minhaTab {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+}
+
+.tab-pane {
+    display: none;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-top: none;
+    animation: fadeEffect 1s;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeEffect {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Botões de Ação da tabela de evidencias anexadas dentro do modal de ver detalhes do RNC */
+.verBtn {
+    padding: 5px 15px;
+    color: #fff;
+    background-color: var(--cor-principal);
+    border: none;
+    border-radius: 5px;
+    transition: 0.3s ease-in-out;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.verBtn:hover {
+    background-color: #ddd;
+    color: #000;
+}
+
+.aceitarBtn {
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #27ae60;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.aceitarBtn:hover {
+    background-color: #2ecc71;
+}
+
+.recusarBtn {
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #b81414;
+    font-weight: bold;
+    color: #fff;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.recusarBtn:hover {
+    background-color: #ec5353;
+}

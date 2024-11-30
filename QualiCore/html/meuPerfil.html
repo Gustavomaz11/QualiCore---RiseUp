@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QualiCore - Meu Perfil</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="shortcut icon" href="css/js/img/faviconQualicore.svg" type="image/x-icon">
+    <link rel="stylesheet" href="css/meuPerfil.css">
+    <script src="css/js/img/meuPerfil.js" defer></script>
+</head>
+<body>
+    <aside>
+        <button type="button" id="btnCloneMenu"><i class="bi bi-x"></i></button>
+        <div class="divisaoSideBar">
+            <div class="conteudoSideBar">
+                <img src="css/js/img/qualicore.svg" alt="qualiCoreLogo" width="290rem" height="auto">
+            </div>
+            <div class="conteudoSideBar">
+                <button type="button" id="dashBtn"><i class="bi bi-house-door"></i>Dashboard</button>
+                <button type="button" id="relatorioBtn"><i class="bi bi-clipboard2-data-fill"></i>Relatório de
+                    Qualidade</button>
+                <button type="button" id="rncBtn"><i class="bi bi-exclamation-triangle"></i>RNC</button>
+                <button type="button" id="dashDetalhadoBtn"><i class="bi bi-graph-up"></i>Gráficos Detalhados</button>
+                <button type="button" id="monitoramentoBtn"><i class="bi bi-clock"></i>Monitoramento</button>
+                <button type="button" id="departamentoBtn"><i class="bi bi-grid"></i>Departamentos</button>
+                <button type="button" id="usuariosBtn"><i class="bi bi-people"></i>Usuários</button>
+            </div>
+        </div>
+        <div class="divisaoSideBar">
+            <div class="conteudoSideBar">
+                <h5>QualiCore - Governo do Estado de Sergipe</h5>
+                <h6>2024 Fundação de Saúde Parreiras Horta</h6>
+            </div>
+            <div class="conteudoSideBar">
+                <h5>FSPH - Sergipe</h5>
+            </div>
+        </div>
+    </aside>
+    <main>
+        <section class="secaoPrincipal">
+            <div class="containerBusca">
+                <input type="text" id="busca" class="campoBusca" placeholder="Procurar">
+                <i class="bi bi-search iconeBusca"></i>
+            </div>
+            <div class="containerBtnAndInfo">
+                <div class="botoesAcao">
+                    <button type="button" id="btnMenu" class="botaoIcone"><i class="bi bi-list"></i></button>
+                    <button type="button" class="botaoIcone" id="cxEntradaBtn"><i class="bi bi-envelope"></i></button>
+                </div>
+                <hr/>
+                <div class="infoUsuario">
+                    <span>Olá, <span id="nome">Gustavo</span></span>
+                    <div class="avatarUsuario" id="botaoPerfil">
+                        <i id="iconPesoa" class="bi bi-person"></i>
+                        <img class="imgPerfil" src="" alt="">
+                    </div>
+                    <div class="dropdownPerfil" id="menuPerfil">
+                        <a class="itemDropdown" id="meuPerfilBtn">
+                            <i class="bi bi-person-circle"></i>
+                            Meu Perfil
+                        </a>
+                        <div class="separadorDropdown"></div>
+                        <a href="index.html" class="itemDropdown">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+    </section>
+        <nav class="navPrincipal"></nav>
+        
+        <div style="display: none;" class="modal">
+            <div class="modalMudarSenha">
+                <div class="modal-header">
+                    <h2>Adicionar Perfil</h2>
+                    <button id="btnFecharModalSenha" class="close-modal">&times;</button>
+                </div>
+                <form id="formMudaSenha">
+                    <div class="form-group">
+                        <label>
+                            Senha antiga
+                            <input required minlength="8" maxlength="32" type="password" name="" id="senhaAntiga">
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Nova senha
+                            <input required minlength="8" maxlength="32" type="password" name="" id="novaSenha">
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Confirme nova senha
+                            <input required minlength="8" maxlength="32" type="password" name="" id="confirmSenha">
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btnAceitar" type="submit">Aceitar</button>
+                        <button class="btnNegar" type="reset">Limpar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <button class="edit-button" id="btnmudarsenha">Mudar Senha</button>
+                    <div class="profile-picture-container">
+                        <img src="" class="profile-picture" id="profilePicture">
+                        <button class="change-photo" onclick="document.getElementById('photoInput').click()">📷</button>
+                        <input type="file" id="photoInput" accept="image/*" onchange="changeProfilePicture(this)">
+                    </div>
+                    <h2 id="fullNameDisplay"></h2>
+                </div>
+    
+                <div class="profile-content">
+                    <div class="info-group">
+                        <span class="info-label">Nome Completo</span>
+                        <div class="info-value" contenteditable="false" id="nomeCompleto">João Souza Silva</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Instituição</span>
+                        <div class="info-value" contenteditable="false" id="instituicao">Hemose</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Setor</span>
+                        <div class="info-value" contenteditable="false" id="department">Tecnologia da Informação</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Cargo</span>
+                        <div class="info-value" contenteditable="false" id="position">Desenvolvedor Sênior</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Gerente do Departamento</span>
+                        <div class="info-value" contenteditable="false" id="manager">Maria Souza</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Status</span>
+                        <span class="status status-active" id="status">Ativo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
