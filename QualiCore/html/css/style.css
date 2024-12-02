@@ -190,7 +190,7 @@ aside {
     transform: scale(1.1);
 }
 
-#popup {
+#notificacao {
     position: fixed;
     top: -100px;
     right: 20px;
@@ -200,10 +200,10 @@ aside {
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: top 0.5s ease-in-out;
-    z-index: 1000;
+    z-index: 6000;
     font-family: Arial, sans-serif;
 }
 
-#popup.show {
+#notificacao.show {
     top: 20px;
 }

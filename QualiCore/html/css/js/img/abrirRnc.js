@@ -32,7 +32,7 @@ const setorAutuado = document.querySelector('#setorAutuado')
 // popup
 
 function mostrarPopup(mensagem) {
-    const popup = document.getElementById('popup');
+    const popup = document.getElementById('notificacao');
     popup.textContent = mensagem;
     popup.classList.add('show');
 

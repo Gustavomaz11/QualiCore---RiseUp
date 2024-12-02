@@ -51,7 +51,7 @@ document.addEventListener('click', function(event) {
 const popup = document.querySelector('.popup')
 const body = document.querySelector('aside')
 function mostrarPopup(mensagem) {
-    const popup = document.getElementById('popup');
+    const popup = document.getElementById('notificacao');
     popup.textContent = mensagem;
     popup.classList.add('show');
 
@@ -226,7 +226,7 @@ async function handleIndeferidaParaRnc (body){
         const response = await responseJson.json()
         console.log(response)
         if(responseJson.status == 201){
-            alert(response.message)
+            mostrarPopup(response.message)
         }
 
         console.log(response)
@@ -408,7 +408,7 @@ async function handleIndeferidaParaRncEditando (body){
         let response = await respostaJson.json()
         console.log(response)
         if(respostaJson.status == 200){
-            alert(response.message)
+            mostrarPopup(response.message)
             window.location.reload(true)
             return
         }
@@ -737,11 +737,11 @@ async function handleTouchMoveEnd (evt) {
         mostrarPopup(`Status alterado para ${targetColumn}`)
         return
         }else if(targetColumn == "concluido"){
-            alert('Para concluir a RNC é necessario abrir o modal e preencher o formulario')
+            mostrarPopup('Para concluir a RNC é necessario abrir o modal e preencher o formulario')
         }else if(rncStatus == 'concluido'){
-            alert('Par modificar o status da RNC é necessario que ela não esteja como concluida')
+            mostrarPopup('Par modificar o status da RNC é necessario que ela não esteja como concluida')
         }else if(targetColumn == "analise" && rncStatus != 'analise'){
-            alert('RNC não pode ter status em análise')
+            mostrarPopup('RNC não pode ter status em análise')
         }else if(targetColumn == 'indeferido'){
             let body = {
                 idRnc,
@@ -780,7 +780,7 @@ async function handleTouchMoveEnd (evt) {
             return
         }
         else{
-            alert('Para modificar o status da RNC é necessario aceitar a solicitação')
+            mostrarPopup('Para modificar o status da RNC é necessario aceitar a solicitação')
         }
     draggedCard = null
     document.querySelectorAll(".drag-over")?.forEach((drag)=>{
@@ -857,11 +857,11 @@ async function handleDragEnd(e) {
         mostrarPopup(`Status alterado para ${targetColumn}`)
         return
     }else if(targetColumn == "concluido"){
-        alert('Para concluir a RNC é necessario abrir o modal e preencher o formulario')
+        mostrarPopup('Para concluir a RNC é necessario abrir o modal e preencher o formulario')
     }else if(rncStatus == 'concluido'){
-        alert('Par modificar o status da RNC é necessario que ela não esteja como concluida')
+        mostrarPopup('Par modificar o status da RNC é necessario que ela não esteja como concluida')
     }else if(targetColumn == "analise" && rncStatus != 'analise'){
-        alert('RNC não pode ter status em análise')
+        mostrarPopup('RNC não pode ter status em análise')
     }else if(targetColumn == 'indeferido'){
         let body = {
             idRnc,
@@ -901,7 +901,7 @@ async function handleDragEnd(e) {
         return
     }
     else{
-        alert('Para modificar o status da RNC é necessario aceitar a solicitação')
+        mostrarPopup('Para modificar o status da RNC é necessario aceitar a solicitação')
     }
     modificandoRncPeloId(draggedCard)
     updateColumnCounts()
@@ -1293,7 +1293,7 @@ function openModalOnDoubleClick(e) {
             if(!changes) // se não tiver mudanças ele retorna
                 return
     
-            alert('Lembre-se você não salvou as alterações do formulario anterior')
+            mostrarPopup('Lembre-se você não salvou as alterações do formulario anterior')
     }
 
     if(rncData.status != 'analise'){
@@ -1394,7 +1394,7 @@ function openModalOnDoubleClick(e) {
 
 
             if(body.status == "indeferido"){
-                alert('Mude o status para a mudança ser salva')
+                mostrarPopup('Mude o status para a mudança ser salva')
                 return
             }
             
