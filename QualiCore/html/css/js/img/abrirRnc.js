@@ -29,6 +29,18 @@ const acaoImediata = document.querySelector("#acaoImediata")
 const investigacao = document.querySelector('#investigacao')
 const setorAutuado = document.querySelector('#setorAutuado')
 
+// popup
+
+function mostrarPopup(mensagem) {
+    const popup = document.getElementById('popup');
+    popup.textContent = mensagem;
+    popup.classList.add('show');
+
+    setTimeout(() => {
+        popup.classList.remove('show');
+    }, 2000);
+}
+
 const btnMenu = document.querySelector('#btnMenu')
 btnMenu.addEventListener('click',()=>{
     document.querySelector('main').style = "display:none;"
@@ -378,8 +390,8 @@ passos[1].addEventListener('submit', async (evt)=>{
     console.log(body)
 
     await handleAddSolicitacao(body)
-
-    alert('Solicitação feita')
+    mostrarPopup('RNC enviado para análise')
+    // alert('Solicitação feita')
 
     setTimeout(()=>{
         window.location.href = 'monitoramento.html'

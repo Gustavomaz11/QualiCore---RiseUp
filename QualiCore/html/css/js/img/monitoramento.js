@@ -50,6 +50,15 @@ document.addEventListener('click', function(event) {
 //popup
 const popup = document.querySelector('.popup')
 const body = document.querySelector('aside')
+function mostrarPopup(mensagem) {
+    const popup = document.getElementById('popup');
+    popup.textContent = mensagem;
+    popup.classList.add('show');
+
+    setTimeout(() => {
+        popup.classList.remove('show');
+    }, 2000);
+}
 
 //tab btns
 const detalhamentoRncBtn = document.querySelector('#detalhamentoBtn');
@@ -270,7 +279,7 @@ async function handleSetIndefirida (body){
 
 
         if(responseJson.status === 201){
-            alert('Conformidade mudada para indefirida')
+            mostrarPopup('RNC alterada para Indeferida')
             return response.insertedId
         }
 
@@ -323,7 +332,7 @@ async function hendleSetRnc (body){
         })
 
         if(rncJson.status == 201){
-            alert('Rnc aceita com sucesso')
+            mostrarPopup('RNC aceita com sucesso')
             window.location.reload(true) 
             return
         }
@@ -347,7 +356,7 @@ async function changeDetalhamentoRnc (changeRnc){
         })
 
         if(rncJson.status == 200){
-            alert('Rnc aceita com sucesso')
+            mostrarPopup('RNC aceita com sucesso')
             window.location.reload(true) 
             return
         }
@@ -373,7 +382,7 @@ async function handleAdd5w2h (body){
         })
 
         if(respostaJson.status == 200){
-            alert('5w2h adicionado com sucesso')
+            mostrarPopup('Plano de Ação adicionado com sucesso')
             window.location.reload(true) 
             return
         }
@@ -421,7 +430,7 @@ async function handleEdit5w2h (body){
         })
 
         if(respostaJson.status == 200){
-            alert('5w2h editado com sucesso')
+            mostrarPopup('Plano de Ação editado com sucesso')
             window.location.reload(true) 
             return
         }
@@ -447,7 +456,7 @@ async function handleConclusao (body){
         })
 
         if(respostaJson.status == 201){
-            alert('Rnc marcada como concluida')
+            mostrarPopup('RNC Concluída')
             window.location.reload(true) 
             return
         }
@@ -725,7 +734,7 @@ async function handleTouchMoveEnd (evt) {
         modificandoRncPeloId(draggedCard) 
         updateColumnCounts()
         atualizandoRnc()
-        alert(`Status alterado para ${targetColumn}`)
+        mostrarPopup(`Status alterado para ${targetColumn}`)
         return
         }else if(targetColumn == "concluido"){
             alert('Para concluir a RNC é necessario abrir o modal e preencher o formulario')
@@ -845,7 +854,7 @@ async function handleDragEnd(e) {
         modificandoRncPeloId(draggedCard) 
         updateColumnCounts()
         atualizandoRnc()
-        alert(`Status alterado para ${targetColumn}`)
+        mostrarPopup(`Status alterado para ${targetColumn}`)
         return
     }else if(targetColumn == "concluido"){
         alert('Para concluir a RNC é necessario abrir o modal e preencher o formulario')

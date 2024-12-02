@@ -2,8 +2,8 @@
 
 :root {
     --cor-principal: #164095;
-    --cor-secundaria:#f0f0f0;
-    --fonte-principal: "Roboto", sans-serif; 
+    --cor-secundaria: #f0f0f0;
+    --fonte-principal: "Roboto", sans-serif;
     --cor-texto: #333;
     --cor-fundo: #f4f6f9;
     --cor-destaque: #e74c3c;
@@ -82,9 +82,9 @@ aside {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    -webkit-box-shadow: 6px 0px 5px 0px rgba(0,0,0,1);
-    -moz-box-shadow: 6px 0px 5px 0px rgba(0,0,0,1);
-    box-shadow: 6px 0px 5px 0px rgba(0,0,0,1);
+    -webkit-box-shadow: 6px 0px 5px 0px rgba(0, 0, 0, 1);
+    -moz-box-shadow: 6px 0px 5px 0px rgba(0, 0, 0, 1);
+    box-shadow: 6px 0px 5px 0px rgba(0, 0, 0, 1);
 
     @media (max-width:720px) {
         display: none;
@@ -162,7 +162,8 @@ aside {
     font-size: 18px;
 }
 
-.conteudoSideBar h5, .conteudoSideBar h6 {
+.conteudoSideBar h5,
+.conteudoSideBar h6 {
     margin: 5px 0;
     font-weight: normal;
     font-size: 12px;
@@ -181,10 +182,28 @@ aside {
     justify-content: center;
     cursor: pointer;
     transition: 0.3s;
-  }
-  
-  .botaoAcaoRapida:hover {
+}
+
+.botaoAcaoRapida:hover {
     background-color: var(--cor-principal);
     color: white;
     transform: scale(1.1);
-  }
+}
+
+#popup {
+    position: fixed;
+    top: -100px;
+    right: 20px;
+    background-color: #2ecc71;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: top 0.5s ease-in-out;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+#popup.show {
+    top: 20px;
+}
